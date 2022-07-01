@@ -6,6 +6,8 @@
 > 
 > *[https://arxiv.org/abs/2206.14651](https://arxiv.org/abs/2206.14651)*
 
+<p align="center"><img src="assets/Results_Bubbles.png"/></p>
+
 ## Abstract
 
 The goal of multi-object tracking (MOT) is detecting and tracking all the objects in a scene, while keeping a unique identifier for each object. In this paper, we present a new robust state-of-the-art tracker, which can combine the advantages of motion and appearance information, along with camera-motion compensation, and a more accurate Kalman filter state vector. Our new trackers BoT-SORT, and BoT-SORT-ReID rank first in the datasets of MOTChallenge [29, 11] on both MOT17 and MOT20 test sets, in terms of all the main MOT metrics: MOTA, IDF1, and HOTA. For MOT17: 80.5 MOTA, 80.2 IDF1, and 65.0 HOTA are achieved.
