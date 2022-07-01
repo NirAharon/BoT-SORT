@@ -3,13 +3,12 @@
 > [**BoT-SORT: Robust Associations Multi-Pedestrian Tracking**](https://arxiv.org/abs/2206.14651)
 > 
 > Nir Aharon, Roy Orfaig, Ben-Zion Bobrovsky
+
+[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/bot-sort-robust-associations-multi-pedestrian/multi-object-tracking-on-mot17)](https://paperswithcode.com/sota/multi-object-tracking-on-mot17?p=bot-sort-robust-associations-multi-pedestrian)
 > 
 > *[https://arxiv.org/abs/2206.14651](https://arxiv.org/abs/2206.14651)*
 
 <p align="center"><img src="assets/Results_Bubbles.png"/></p>
-
-	
-[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/bot-sort-robust-associations-multi-pedestrian/multi-object-tracking-on-mot17)](https://paperswithcode.com/sota/multi-object-tracking-on-mot17?p=bot-sort-robust-associations-multi-pedestrian)
 
 
 ## Abstract
