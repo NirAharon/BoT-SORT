@@ -12,8 +12,9 @@ The goal of multi-object tracking (MOT) is detecting and tracking all the object
 
 ### Visualization results on MOT challenge test set
 
-https://user-images.githubusercontent.com/57259165/173921284-c1dc8ed0-3316-45a3-a8ea-3fecd50b4311.mp4
+https://user-images.githubusercontent.com/57259165/176918419-1390c95c-dcdb-4e06-89f4-e5cc8d46979f.mp4
 
+https://user-images.githubusercontent.com/57259165/173921284-c1dc8ed0-3316-45a3-a8ea-3fecd50b4311.mp4
 
 ## Tracking performance
 ### Results on MOT17 challenge test set
@@ -31,9 +32,11 @@ https://user-images.githubusercontent.com/57259165/173921284-c1dc8ed0-3316-45a3-
 
 ## Installation
 
-BoT-SORT code is based on ByteTrack and FastReID. <br>
-Visit theirs installations guides for more setup options.
+The code was tested on Ubuntu 20.04
 
+BoT-SORT code is based on ByteTrack and FastReID. <br>
+Visit their installation guides for more setup options.
+ 
 ### Setup with Anaconda
 **Step 1.** Create Conda environment and install pytorch.
 ```shell
@@ -64,22 +67,6 @@ pip3 install cython_bbox
 pip3 install faiss-cpu
 pip3 install faiss-gpu
 ```
-
-## Note
-
-Our camera motion compensation module is based on the OpenCV contrib C++ version of VideoStab Global Motion Estimation, 
-which currently does not have a Python version. <br>
-Motion files can be generated using the C++ project called 'VideoCameraCorrection' in the GMC folder. <br> 
-The generated files can be used from the tracker. <br>
-
-In addition, python-based motion estimation techniques are available and can be chosen by passing <br> 
-'--cmc-method' <files | orb | ecc> to demo.py or track.py. 
-
-## TODO
-- [ ] Check that all the paper results can be reproduced using this code.
-- [ ] Create OpenCV VideoStab GMC python binding or write Python version.
-- [ ] Add deployment code.
-
 
 ## Data Preparation
 
@@ -163,7 +150,7 @@ python3 tools/track.py <dataets_dir/MOT20> --default-parameters --with-reid --be
 python3 tools/interpolation.py --txt_path <path_to_track_result>
 ```
 
-* **Evaluation on MOT17 validation set (second half of the train)**
+* **Evaluation on MOT17 validation set (the second half of the train set)**
 
 ```shell
 cd <BoT-SORT_dir>
@@ -192,6 +179,19 @@ cd <BoT-SORT_dir>
 python3 tools/demo.py video -f yolox/exps/example/mot/yolox_x_mix_det.py -c yolox/pretrained/bytetrack_x_mot17.pth.tar --with-reid --fp16 --fuse --save_result
 ```
 
+## Note
+
+Our camera motion compensation module is based on the OpenCV contrib C++ version of VideoStab Global Motion Estimation, 
+which currently does not have a Python version. <br>
+Motion files can be generated using the C++ project called 'VideoCameraCorrection' in the GMC folder. <br> 
+The generated files can be used from the tracker. <br>
+
+In addition, python-based motion estimation techniques are available and can be chosen by passing <br> 
+'--cmc-method' <files | orb | ecc> to demo.py or track.py. 
+
+## TODO
+- [ ] Create OpenCV VideoStab GMC python binding or write Python version.
+- [ ] Add deployment code.
 
 ## Citation
 
