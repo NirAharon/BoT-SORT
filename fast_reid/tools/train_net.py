@@ -27,10 +27,6 @@ def setup(args):
 
 
 def main(args):
-    args.config_file = '/home/nir/PythonProjects/Thesis/BoT-SORT_main/fast_reid/configs/MOT17/sbs_S50.yml'
-    # # args.config_file = '/home/nir/PythonProjects/Thesis/BoT-SORT_main/fast_reid/configs/Market1501/sbs_S50.yml'
-    args.opts = ['MODEL.DEVICE', "cuda:0"]
-    # args.resume = False  # True | False
 
     cfg = setup(args)
 
