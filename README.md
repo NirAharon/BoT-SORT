@@ -184,7 +184,7 @@ python3 tools/track.py -h
 
 ```shell
 cd <BoT-SORT_dir>
-python3 tools/demo.py video -f yolox/exps/example/mot/yolox_x_mix_det.py -c yolox/pretrained/bytetrack_x_mot17.pth.tar --with-reid --fp16 --fuse --save_result
+python3 tools/demo.py video --path <path_to_video> -f yolox/exps/example/mot/yolox_x_mix_det.py -c pretrained/bytetrack_x_mot17.pth.tar --with-reid --fuse-score --fp16 --fuse --save_result
 ```
 
 ## Note
@@ -197,7 +197,8 @@ The generated files can be used from the tracker. <br>
 In addition, python-based motion estimation techniques are available and can be chosen by passing <br> 
 '--cmc-method' <files | orb | ecc> to demo.py or track.py. 
 
-## TODO
+## Coming Soon
+- [ ] Add multi-class support.
 - [ ] Create OpenCV VideoStab GMC python binding or write Python version.
 - [ ] Add deployment code.
 

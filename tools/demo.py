@@ -49,15 +49,16 @@ def make_parser():
     parser.add_argument("--aspect_ratio_thresh", type=float, default=1.6, help="threshold for filtering out boxes of which aspect ratio are above the given value.")
     parser.add_argument('--min_box_area', type=float, default=10, help='filter out tiny boxes')
     parser.add_argument("--fuse-score", dest="fuse_score", default=False, action="store_true", help="fuse score and iou for association")
+
     # CMC
     parser.add_argument("--cmc-method", default="orb", type=str, help="cmc method: files (Vidstab GMC) | orb | ecc")
 
     # ReID
     parser.add_argument("--with-reid", dest="with_reid", default=False, action="store_true", help="test mot20.")
     parser.add_argument("--fast-reid-config", dest="fast_reid_config", default=r"fast_reid/configs/MOT17/sbs_S50.yml", type=str, help="reid config file path")
-    parser.add_argument("--fast-reid-weights", dest="fast_reid_weights", default=r"fast_reid/pretrained/mot17_ablation_sbs_S50.pth", type=str,help="reid config file path")
+    parser.add_argument("--fast-reid-weights", dest="fast_reid_weights", default=r"pretrained/mot17_sbs_S50.pth", type=str,help="reid config file path")
     parser.add_argument('--proximity_thresh', type=float, default=0.5, help='threshold for rejecting low overlap reid matches')
-    parser.add_argument('--appearance_thresh', type=float, default=0.2, help='threshold for rejecting low appearance similarity reid matches')
+    parser.add_argument('--appearance_thresh', type=float, default=0.25, help='threshold for rejecting low appearance similarity reid matches')
     return parser
 
 
@@ -161,13 +162,14 @@ def image_demo(predictor, vis_folder, current_time, args):
         outputs, img_info = predictor.inference(img_path, timer)
         scale = min(exp.test_size[0] / float(img_info['height'], ), exp.test_size[1] / float(img_info['width']))
 
+        detections = []
         if outputs[0] is not None:
             outputs = outputs[0].cpu().numpy()
             detections = outputs[:, :7]
             detections[:, :4] /= scale
 
             # Run tracker
-            online_targets = tracker.update(detections, img_info)
+            online_targets = tracker.update(detections, img_info['raw_img'])
 
             online_tlwhs = []
             online_ids = []
@@ -248,7 +250,7 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
                 detections[:, :4] /= scale
 
                 # Run tracker
-                online_targets = tracker.update(detections, img_info)
+                online_targets = tracker.update(detections, img_info["raw_img"])
 
                 online_tlwhs = []
                 online_ids = []
@@ -348,7 +350,7 @@ def main(exp, args):
 
     predictor = Predictor(model, exp, trt_file, decoder, args.device, args.fp16)
     current_time = time.localtime()
-    if args.demo == "image":
+    if args.demo == "image" or args.demo == "images":
         image_demo(predictor, vis_folder, current_time, args)
     elif args.demo == "video" or args.demo == "webcam":
         imageflow_demo(predictor, vis_folder, current_time, args)
