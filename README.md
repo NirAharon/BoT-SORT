@@ -205,15 +205,11 @@ In addition, python-based motion estimation techniques are available and can be 
 ## Citation
 
 ```
-@misc{https://doi.org/10.48550/arxiv.2206.14651,
-  doi = {10.48550/ARXIV.2206.14651},
-  url = {https://arxiv.org/abs/2206.14651},
-  author = {Aharon, Nir and Orfaig, Roy and Bobrovsky, Ben-Zion},
-  keywords = {Computer Vision and Pattern Recognition (cs.CV), FOS: Computer and information sciences, FOS: Computer and information sciences},
-  title = {BoT-SORT: Robust Associations Multi-Pedestrian Tracking},
-  publisher = {arXiv},
-  year = {2022},
-  copyright = {arXiv.org perpetual, non-exclusive license}
+@article{aharon2022bot,
+  title={BoT-SORT: Robust Associations Multi-Pedestrian Tracking},
+  author={Aharon, Nir and Orfaig, Roy and Bobrovsky, Ben-Zion},
+  journal={arXiv preprint arXiv:2206.14651},
+  year={2022}
 }
 ```
 

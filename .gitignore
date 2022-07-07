@@ -5,3 +5,5 @@
 /pretrained/mot20_sbs_S50.pth
 /pretrained/yolox_x.pth
 /YOLOX_outputs/
+/.idea/
+*.pyc

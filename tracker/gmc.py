@@ -202,12 +202,15 @@ class GMC:
             plt.show()
 
         # Find rigid matrix
-        H, inliesrs = cv2.estimateAffinePartial2D(prevPoints, currPoints, cv2.RANSAC)
+        if (np.size(prevPoints, 0) > 4) and (np.size(prevPoints, 0) == np.size(prevPoints, 0)):
+            H, inliesrs = cv2.estimateAffinePartial2D(prevPoints, currPoints, cv2.RANSAC)
 
-        # Handle downscale
-        if self.downscale > 1.0:
-            H[0, 2] *= self.downscale
-            H[1, 2] *= self.downscale
+            # Handle downscale
+            if self.downscale > 1.0:
+                H[0, 2] *= self.downscale
+                H[1, 2] *= self.downscale
+        else:
+            print('Warning: not enough matching points')
 
         # Store to next iteration
         self.prevFrame = frame.copy()
