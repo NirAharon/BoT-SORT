@@ -14,13 +14,17 @@ from fast_reid.fast_reid_interfece import FastReIDInterface
 class STrack(BaseTrack):
     shared_kalman = KalmanFilter()
 
-    def __init__(self, tlwh, score, feat=None, feat_history=50):
+    def __init__(self, tlwh, score, cls, feat=None, feat_history=50):
 
         # wait activate
         self._tlwh = np.asarray(tlwh, dtype=np.float)
         self.kalman_filter = None
         self.mean, self.covariance = None, None
         self.is_activated = False
+
+        self.cls = -1
+        self.cls_hist = []  # (cls id, freq)
+        self.update_cls(cls, score)
 
         self.score = score
         self.tracklet_len = 0
@@ -41,6 +45,25 @@ class STrack(BaseTrack):
             self.smooth_feat = self.alpha * self.smooth_feat + (1 - self.alpha) * feat
         self.features.append(feat)
         self.smooth_feat /= np.linalg.norm(self.smooth_feat)
+
+    def update_cls(self, cls, score):
+        if len(self.cls_hist) > 0:
+            max_freq = 0
+            found = False
+            for c in self.cls_hist:
+                if cls == c[0]:
+                    c[1] += score
+                    found = True
+
+                if c[1] > max_freq:
+                    max_freq = c[1]
+                    self.cls = c[0]
+            if not found:
+                self.cls_hist.append([cls, score])
+                self.cls = cls
+        else:
+            self.cls_hist.append([cls, score])
+            self.cls = cls
 
     def predict(self):
         mean_state = self.mean.copy()
@@ -109,6 +132,8 @@ class STrack(BaseTrack):
             self.track_id = self.next_id()
         self.score = new_track.score
 
+        self.update_cls(new_track.cls, new_track.score)
+
     def update(self, new_track, frame_id):
         """
         Update a matched track
@@ -131,6 +156,7 @@ class STrack(BaseTrack):
         self.is_activated = True
 
         self.score = new_track.score
+        self.update_cls(new_track.cls, new_track.score)
 
     @property
     def tlwh(self):
@@ -271,11 +297,11 @@ class BoTSORT(object):
         if len(dets) > 0:
             '''Detections'''
             if self.args.with_reid:
-                detections = [STrack(STrack.tlbr_to_tlwh(tlbr), s, f) for
-                              (tlbr, s, f) in zip(dets, scores_keep, features_keep)]
+                detections = [STrack(STrack.tlbr_to_tlwh(tlbr), s, c, f) for
+                              (tlbr, s, c, f) in zip(dets, scores_keep, classes_keep, features_keep)]
             else:
-                detections = [STrack(STrack.tlbr_to_tlwh(tlbr), s) for
-                              (tlbr, s) in zip(dets, scores_keep)]
+                detections = [STrack(STrack.tlbr_to_tlwh(tlbr), s, c) for
+                              (tlbr, s, c) in zip(dets, scores_keep, classes_keep)]
         else:
             detections = []
 
@@ -352,8 +378,8 @@ class BoTSORT(object):
         # association the untrack to the low score detections
         if len(dets_second) > 0:
             '''Detections'''
-            detections_second = [STrack(STrack.tlbr_to_tlwh(tlbr), s) for
-                                 (tlbr, s) in zip(dets_second, scores_second)]
+            detections_second = [STrack(STrack.tlbr_to_tlwh(tlbr), s, c) for
+                                 (tlbr, s, c) in zip(dets_second, scores_second, classes_second)]
         else:
             detections_second = []
 
