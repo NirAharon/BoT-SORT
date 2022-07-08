@@ -198,7 +198,7 @@ In addition, python-based motion estimation techniques are available and can be 
 '--cmc-method' <files | orb | ecc> to demo.py or track.py. 
 
 ## Coming Soon
-- [ ] Add multi-class support.
+- [x] Add multi-class support.
 - [ ] Create OpenCV VideoStab GMC python binding or write Python version.
 - [ ] Add deployment code.
 
