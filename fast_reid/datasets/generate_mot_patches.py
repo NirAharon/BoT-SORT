@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def generate_trajectories(file_path, groundTrues, pedestrianHeight=-1.0, focalLength=6000):
+def generate_trajectories(file_path, groundTrues):
     f = open(file_path, 'r')
 
     lines = f.read().split('\n')
@@ -57,7 +57,7 @@ def main(args):
     # Get gt data
     data_path = os.path.join(args.data_path, 'MOT' + str(args.mot), 'train')
 
-    if args.mot == 17:
+    if args.mot == '17':
         seqs = [f for f in os.listdir(data_path) if 'FRCNN' in f]
     else:
         seqs = os.listdir(data_path)
