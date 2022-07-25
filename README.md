@@ -21,10 +21,10 @@
 
 ## Coming Soon
 - [ ] Trained YOLOv7 models for MOTChallenge.
-- [x] Add YOLOv7 detector.
-- [x] Add multi-class support.
+- [x] YOLOv7 detector.
+- [x] Multi-class support.
 - [ ] Create OpenCV VideoStab GMC python binding or write Python version.
-- [ ] Add deployment code.
+- [ ] Deployment code.
 
 ## Abstract
 
