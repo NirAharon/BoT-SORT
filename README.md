@@ -5,6 +5,7 @@
 > Nir Aharon, Roy Orfaig, Ben-Zion Bobrovsky
 
 [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/bot-sort-robust-associations-multi-pedestrian/multi-object-tracking-on-mot17)](https://paperswithcode.com/sota/multi-object-tracking-on-mot17?p=bot-sort-robust-associations-multi-pedestrian)
+
 [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/bot-sort-robust-associations-multi-pedestrian/multi-object-tracking-on-mot20-1)](https://paperswithcode.com/sota/multi-object-tracking-on-mot20-1?p=bot-sort-robust-associations-multi-pedestrian)
 > 
 > *[https://arxiv.org/abs/2206.14651](https://arxiv.org/abs/2206.14651)*
@@ -33,6 +34,8 @@ The goal of multi-object tracking (MOT) is detecting and tracking all the object
 https://user-images.githubusercontent.com/57259165/177045531-947d3146-4d07-4549-a095-3d2daa4692be.mp4
 
 https://user-images.githubusercontent.com/57259165/177048139-05dcb382-010e-41a6-b607-bb2b76afc7db.mp4
+
+https://user-images.githubusercontent.com/57259165/180818066-f67d1f78-515e-4ee2-810f-abfed5a0afcb.mp4
 
 ## Tracking performance
 ### Results on MOT17 challenge test set
