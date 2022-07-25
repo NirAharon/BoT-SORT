@@ -52,8 +52,11 @@ def preprocess(image, input_size):
 class FastReIDInterface:
     def __init__(self, config_file, weights_path, device, batch_size=8):
         super(FastReIDInterface, self).__init__()
+        if device != 'cpu':
+            self.device = 'cuda'
+        else:
+            self.device = 'cpu'
 
-        self.device = device
         self.batch_size = batch_size
 
         self.cfg = setup_cfg(config_file, ['MODEL.WEIGHTS', weights_path])
@@ -63,7 +66,10 @@ class FastReIDInterface:
 
         Checkpointer(self.model).load(weights_path)
 
-        self.model = self.model.eval().to(device=self.device).half()
+        if self.device != 'cpu':
+            self.model = self.model.eval().to(device='cuda').half()
+        else:
+            self.model = self.model.eval()
 
         self.pH, self.pW = self.cfg.INPUT.SIZE_TEST
 

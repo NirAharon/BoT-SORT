@@ -378,9 +378,20 @@ class BoTSORT(object):
 
         '''Deal with unconfirmed tracks, usually tracks with only one beginning frame'''
         detections = [detections[i] for i in u_detection]
-        dists = matching.iou_distance(unconfirmed, detections)
+        ious_dists = matching.iou_distance(unconfirmed, detections)
+        ious_dists_mask = (ious_dists > self.proximity_thresh)
         if not self.args.mot20:
-            dists = matching.fuse_score(dists, detections)
+            ious_dists = matching.fuse_score(ious_dists, detections)
+
+        if self.args.with_reid:
+            emb_dists = matching.embedding_distance(unconfirmed, detections) / 2.0
+            raw_emb_dists = emb_dists.copy()
+            emb_dists[emb_dists > self.appearance_thresh] = 1.0
+            emb_dists[ious_dists_mask] = 1.0
+            dists = np.minimum(ious_dists, emb_dists)
+        else:
+            dists = ious_dists
+
         matches, u_unconfirmed, u_detection = matching.linear_assignment(dists, thresh=0.7)
         for itracked, idet in matches:
             unconfirmed[itracked].update(detections[idet], self.frame_id)

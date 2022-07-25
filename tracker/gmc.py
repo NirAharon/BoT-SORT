@@ -151,6 +151,15 @@ class GMC:
 
         maxSpatialDistance = 0.25 * np.array([width, height])
 
+        # Handle empty matches case
+        if len(knnMatches) == 0:
+            # Store to next iteration
+            self.prevFrame = frame.copy()
+            self.prevKeyPoints = copy.copy(keypoints)
+            self.prevDescriptors = copy.copy(descriptors)
+
+            return H
+
         for m, n in knnMatches:
             if m.distance < 0.9 * n.distance:
                 prevKeyPointLocation = self.prevKeyPoints[m.queryIdx].pt

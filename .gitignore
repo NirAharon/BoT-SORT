@@ -1,9 +1,11 @@
-/pretrained/bytetrack_ablation.pth.tar
-/pretrained/bytetrack_x_mot17.pth.tar
-/pretrained/bytetrack_x_mot20.tar
-/pretrained/mot17_sbs_S50.pth
-/pretrained/mot20_sbs_S50.pth
-/pretrained/yolox_x.pth
+/pretrained/*
 /YOLOX_outputs/
+/runs/
+/build
 /.idea/
 *.pyc
+/tools/private
+wandb/
+*egg-info*
+fast_reid/datasets/MOT17-ReID
+*/__pycache__

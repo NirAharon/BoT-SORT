@@ -119,6 +119,9 @@ class Predictor(object):
         else:
             img_info["file_name"] = None
 
+        if img is None:
+            raise ValueError("Empty image: ", img_info["file_name"])
+
         height, width = img.shape[:2]
         img_info["height"] = height
         img_info["width"] = width
@@ -292,7 +295,7 @@ if __name__ == "__main__":
     mainTimer.tic()
 
     for ext in seqs_ext:
-        for i in [2]: # seqs:
+        for i in seqs:
             if i < 10:
                 seq = 'MOT' + str(MOT) + '-0' + str(i)
             else:

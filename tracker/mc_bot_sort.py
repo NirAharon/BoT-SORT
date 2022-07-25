@@ -261,27 +261,24 @@ class BoTSORT(object):
         removed_stracks = []
 
         if len(output_results):
-            if output_results.shape[1] == 5:
-                scores = output_results[:, 4]
-                bboxes = output_results[:, :4]
-                classes = output_results[:, -1]
-            else:
-                scores = output_results[:, 4] * output_results[:, 5]
-                bboxes = output_results[:, :4]  # x1y1x2y2
-                classes = output_results[:, -1]
+            bboxes = output_results[:, :4]
+            scores = output_results[:, 4]
+            classes = output_results[:, 5]
+            features = output_results[:, 6:]
 
             # Remove bad detections
             lowest_inds = scores > self.track_low_thresh
             bboxes = bboxes[lowest_inds]
             scores = scores[lowest_inds]
             classes = classes[lowest_inds]
+            features = output_results[lowest_inds]
 
             # Find high threshold detections
             remain_inds = scores > self.args.track_high_thresh
             dets = bboxes[remain_inds]
             scores_keep = scores[remain_inds]
             classes_keep = classes[remain_inds]
-
+            features_keep = features[remain_inds]
         else:
             bboxes = []
             scores = []
@@ -296,7 +293,7 @@ class BoTSORT(object):
 
         if len(dets) > 0:
             '''Detections'''
-            if self.args.with_reid:
+            if self.args.with_reid or self.args.jde:
                 detections = [STrack(STrack.tlbr_to_tlwh(tlbr), s, c, f) for
                               (tlbr, s, c, f) in zip(dets, scores_keep, classes_keep, features_keep)]
             else:
