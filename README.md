@@ -12,13 +12,16 @@
 
 <p align="center"><img src="assets/Results_Bubbles.png"/></p>
 
-## Updates 🚀
+## Highlights 🚀
 
-- Add YOLOv7 support.
-- Add multi-class support.
+- YOLOX & YOLOv7 support
+- Multi-class support
+- Camera motion compensation
+- Re-identification
 
 ## Coming Soon
 - [ ] Trained YOLOv7 models for MOTChallenge.
+- [x] Add YOLOv7 detector.
 - [x] Add multi-class support.
 - [ ] Create OpenCV VideoStab GMC python binding or write Python version.
 - [ ] Add deployment code.
