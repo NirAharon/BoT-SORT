@@ -135,8 +135,7 @@ def detect(save_img=False):
                 tlbr = t.tlbr
                 tid = t.track_id
                 tcls = t.cls
-                vertical = tlwh[2] / tlwh[3] > opt.aspect_ratio_thresh
-                if tlwh[2] * tlwh[3] > opt.min_box_area and not vertical:
+                if tlwh[2] * tlwh[3] > opt.min_box_area:
                     online_tlwhs.append(tlwh)
                     online_ids.append(tid)
                     online_scores.append(t.score)
@@ -214,7 +213,7 @@ if __name__ == '__main__':
 
     # tracking args
     parser.add_argument("--track_high_thresh", type=float, default=0.3, help="tracking confidence threshold")
-    parser.add_argument("--track_low_thresh", default=0.1, type=float, help="lowest detection threshold")
+    parser.add_argument("--track_low_thresh", default=0.05, type=float, help="lowest detection threshold")
     parser.add_argument("--new_track_thresh", default=0.4, type=float, help="new track thresh")
     parser.add_argument("--track_buffer", type=int, default=30, help="the frames for keep lost tracks")
     parser.add_argument("--match_thresh", type=float, default=0.7, help="matching threshold for tracking")
@@ -239,6 +238,7 @@ if __name__ == '__main__':
                         help='threshold for rejecting low appearance similarity reid matches')
 
     opt = parser.parse_args()
+
     opt.jde = False
     opt.ablation = False
 

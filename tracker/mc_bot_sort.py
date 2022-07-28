@@ -293,7 +293,7 @@ class BoTSORT(object):
 
         if len(dets) > 0:
             '''Detections'''
-            if self.args.with_reid or self.args.jde:
+            if self.args.with_reid:
                 detections = [STrack(STrack.tlbr_to_tlwh(tlbr), s, c, f) for
                               (tlbr, s, c, f) in zip(dets, scores_keep, classes_keep, features_keep)]
             else:

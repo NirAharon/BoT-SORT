@@ -47,7 +47,6 @@ def make_parser():
     parser.add_argument("--new_track_thresh", default=0.7, type=float, help="new track thresh")
     parser.add_argument("--track_buffer", type=int, default=30, help="the frames for keep lost tracks")
     parser.add_argument("--match_thresh", type=float, default=0.8, help="matching threshold for tracking")
-    parser.add_argument("--aspect_ratio_thresh", type=float, default=1.6, help="threshold for filtering out boxes of which aspect ratio are above the given value.")
     parser.add_argument('--min_box_area', type=float, default=10, help='filter out tiny boxes')
     parser.add_argument("--fuse-score", dest="fuse_score", default=False, action="store_true", help="fuse score and iou for association")
 
@@ -179,8 +178,7 @@ def image_demo(predictor, vis_folder, current_time, args):
         for t in online_targets:
             tlwh = t.tlwh
             tid = t.track_id
-            vertical = tlwh[2] / tlwh[3] > args.aspect_ratio_thresh
-            if tlwh[2] * tlwh[3] > args.min_box_area and not vertical:
+            if tlwh[2] * tlwh[3] > args.min_box_area:
                 online_tlwhs.append(tlwh)
                 online_ids.append(tid)
                 online_scores.append(t.score)
@@ -263,8 +261,7 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
             for t in online_targets:
                 tlwh = t.tlwh
                 tid = t.track_id
-                vertical = tlwh[2] / tlwh[3] > args.aspect_ratio_thresh
-                if tlwh[2] * tlwh[3] > args.min_box_area and not vertical:
+                if tlwh[2] * tlwh[3] > args.min_box_area:
                     online_tlwhs.append(tlwh)
                     online_ids.append(tid)
                     online_scores.append(t.score)
