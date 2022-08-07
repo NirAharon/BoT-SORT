@@ -104,7 +104,10 @@ class FastReIDInterface:
 
             # Make shape with a new batch dimension which is adapted for network input
             patch = torch.as_tensor(patch.astype("float32").transpose(2, 0, 1))
-            patch = patch.to(device=self.device).half()
+            if self.device != 'cpu':
+                patch = patch.to(device=self.device).half()
+            else:
+                patch = patch.to(device=self.device)
 
             patches.append(patch)
 
