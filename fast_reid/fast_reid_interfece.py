@@ -18,6 +18,7 @@ def setup_cfg(config_file, opts):
     cfg = get_cfg()
     cfg.merge_from_file(config_file)
     cfg.merge_from_list(opts)
+    print(opts, cfg.MODEL.DEVICE)
     cfg.MODEL.BACKBONE.PRETRAIN = False
 
     cfg.freeze()
@@ -52,15 +53,17 @@ def preprocess(image, input_size):
 class FastReIDInterface:
     def __init__(self, config_file, weights_path, device, batch_size=8):
         super(FastReIDInterface, self).__init__()
-        if device != 'cpu':
+        
+        if str(device) != 'cpu':
             self.device = 'cuda'
         else:
             self.device = 'cpu'
 
         self.batch_size = batch_size
 
-        self.cfg = setup_cfg(config_file, ['MODEL.WEIGHTS', weights_path])
-
+        self.cfg = setup_cfg(config_file, ['MODEL.WEIGHTS', weights_path, "MODEL.DEVICE", self.device])
+        # self.cfg.MODEL.DEVICE = self.device
+        print( self.cfg["MODEL"]["DEVICE"])
         self.model = build_model(self.cfg)
         self.model.eval()
 
