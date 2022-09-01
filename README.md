@@ -12,6 +12,23 @@
 
 <p align="center"><img src="assets/Results_Bubbles.png"/></p>
 
+## Updates of this repo
+**9/1/2022**
+- Open --downscale parameter to speed up track speed.
+- Add --legacy parameter to support un-normalization input.
+- Add --save_size parameter to adjust the size of saved video/image.
+- Add time counter for det, track, save separately.
+
+## Experiments of this repo
+### GMC downscale
+downscale in GMC defaults to 2. It cost unbearable 3.6s. Time increase 10 times when downscale increase in 2 times.
+
+| Tracker       |  input_size |  downscale  |  time  |
+|:--------------|:-------:|:------:|:------:|
+| BoT-SORT      |  (768, 1280)  |  2  |  64.6  |
+| BoT-SORT      |  80.5   |  80.2  |  65.0  |
+
+
 ## Highlights 🚀
 
 - YOLOX & YOLOv7 support
@@ -216,16 +233,16 @@ Demo with BoT-SORT(-ReID) based YOLOX and multi-class.
 cd <BoT-SORT_dir>
 
 # Original example
-python3 tools/demo.py video --path <path_to_video> -f yolox/exps/example/mot/yolox_x_mix_det.py -c pretrained/bytetrack_x_mot17.pth.tar --with-reid --fuse-score --fp16 --fuse --save_result
+python3 tools/demo.py video --path <path_to_video> -f yolox/exps/example/mot/yolox_x_mix_det.py -c pretrained/bytetrack_x_mot17.pth.tar --with-reid --fuse-score --fp16 --fuse --save_result --legacy
 
 # Multi-class example
-python3 tools/mc_demo.py video --path <path_to_video> -f yolox/exps/example/mot/yolox_x_mix_det.py -c pretrained/bytetrack_x_mot17.pth.tar --with-reid --fuse-score --fp16 --fuse --save_result
+python3 tools/mc_demo.py video --path <path_to_video> -f yolox/exps/example/mot/yolox_x_mix_det.py -c pretrained/bytetrack_x_mot17.pth.tar --with-reid --fuse-score --fp16 --fuse --save_result --legacy
 ```
 
 Demo with BoT-SORT(-ReID) based YOLOv7 and multi-class.
 ```shell
 cd <BoT-SORT_dir>
-python3 tools/mc_demo_yolov7.py --weights pretrained/yolov7-d6.pt --source <path_to_video/images> --fuse-score --agnostic-nms (--with-reid)
+python3 tools/mc_demo_yolov7.py --weights pretrained/yolov7-d6.pt --source <path_to_video/images> --fuse-score --agnostic-nms (--with-reid) --legacy
 ```
 
 ## Note
