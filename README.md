@@ -24,9 +24,10 @@
 downscale in GMC defaults to 2. It cost unbearable 3.6s. Time increase 10 times when downscale increase in 2 times.
 
 | Tracker       |  input_size |  downscale  |  time  |
-|:--------------|:-------:|:------:|:------:|
-| BoT-SORT      |  (768, 1280)  |  2  |  64.6  |
-| BoT-SORT      |  80.5   |  80.2  |  65.0  |
+|:--------------|:-------------:|:------:|:------:|
+| BoT-SORT      |  (768, 1280)  |  2  |  3.6  |
+| BoT-SORT      |  (768, 1280)  |  4  |  0.26 |
+| BoT-SORT      |  (768, 1280)  |  8  |  0.02 |
 
 
 ## Highlights 🚀
