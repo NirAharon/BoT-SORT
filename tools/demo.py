@@ -354,6 +354,7 @@ def main(exp, args):
         decoder = None
 
     predictor = Predictor(model, exp, trt_file, decoder, args.device, args.fp16)
+    predictor = Predictor(model, exp, trt_file, decoder, args.device, args.fp16, args.legacy)
     current_time = time.localtime()
     if args.demo == "image" or args.demo == "images":
         image_demo(predictor, vis_folder, current_time, args)
