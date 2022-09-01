@@ -353,7 +353,9 @@ def main(exp, args):
         trt_file = None
         decoder = None
 
-    predictor = Predictor(model, exp, trt_file, decoder, args.device, args.fp16)
+    if args.save_size is not None:
+        args.save_size = tuple(map(int, args.save_size.split(',')))
+
     predictor = Predictor(model, exp, trt_file, decoder, args.device, args.fp16, args.legacy)
     current_time = time.localtime()
     if args.demo == "image" or args.demo == "images":
