@@ -29,6 +29,7 @@ def make_parser():
     parser.add_argument("--path", default="", help="path to images or video")
     parser.add_argument("--camid", type=int, default=0, help="webcam demo camera id")
     parser.add_argument("--save_result", action="store_true",help="whether to save the inference result of image/video")
+    parser.add_argument("--save_size", default=None, type=str, help="save size of image/video, used to adjust output size")
     parser.add_argument("-f", "--exp_file", default=None, type=str, help="pls input your expriment description file")
     parser.add_argument("-c", "--ckpt", default=None, type=str, help="ckpt for eval")
     parser.add_argument("--device", default="gpu", type=str, help="device to run our model, can either be cpu or gpu")
@@ -39,6 +40,7 @@ def make_parser():
     parser.add_argument("--fp16", dest="fp16", default=False, action="store_true",help="Adopting mix precision evaluating.")
     parser.add_argument("--fuse", dest="fuse", default=False, action="store_true", help="Fuse conv and bn for testing.")
     parser.add_argument("--trt", dest="trt", default=False, action="store_true", help="Using TensorRT model for testing.")
+    parser.add_argument("--legacy", dest="legacy", default=False, action="store_true", help="legacy code, such as mean/std normalization.")
 
     # tracking args
     parser.add_argument("--track_high_thresh", type=float, default=0.6, help="tracking confidence threshold")
@@ -95,7 +97,8 @@ class Predictor(object):
         trt_file=None,
         decoder=None,
         device=torch.device("cpu"),
-        fp16=False
+        fp16=False,
+        legacy=False
     ):
         self.model = model
         self.decoder = decoder
@@ -116,6 +119,7 @@ class Predictor(object):
             self.model = model_trt
         self.rgb_means = (0.485, 0.456, 0.406)
         self.std = (0.229, 0.224, 0.225)
+        self.legacy = legacy
 
     def inference(self, img, timer):
         img_info = {"id": 0}
@@ -130,7 +134,7 @@ class Predictor(object):
         img_info["width"] = width
         img_info["raw_img"] = img
 
-        img, ratio = preproc(img, self.test_size, self.rgb_means, self.std)
+        img, ratio = preproc(img, self.test_size, self.rgb_means, self.std, legacy=self.legacy)
         img_info["ratio"] = ratio
         img = torch.from_numpy(img).unsqueeze(0).float().to(self.device)
         if self.fp16:
