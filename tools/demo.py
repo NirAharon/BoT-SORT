@@ -161,11 +161,17 @@ def image_demo(predictor, vis_folder, current_time, args):
     timer = Timer()
     results = []
 
+    st_det = 0
+    st_track = 0
+    st_save = 0
     for frame_id, img_path in enumerate(files, 1):
 
+        t0 = time.time()
         # Detect objects
         outputs, img_info = predictor.inference(img_path, timer)
         scale = min(exp.test_size[0] / float(img_info['height'], ), exp.test_size[1] / float(img_info['width']))
+        t_det = time.time()
+        st_det += t_det - t0
 
         detections = []
         if outputs[0] is not None:
@@ -199,6 +205,9 @@ def image_demo(predictor, vis_folder, current_time, args):
             timer.toc()
             online_im = img_info['raw_img']
 
+        t_track = time.time()
+        st_track += t_track - t_det
+
         # result_image = predictor.visual(outputs[0], img_info, predictor.confthre)
         if args.save_result:
             timestamp = time.strftime("%Y_%m_%d_%H_%M_%S", current_time)
@@ -206,12 +215,19 @@ def image_demo(predictor, vis_folder, current_time, args):
             os.makedirs(save_folder, exist_ok=True)
             cv2.imwrite(osp.join(save_folder, osp.basename(img_path)), online_im)
 
-        if frame_id % 20 == 0:
-            logger.info('Processing frame {} ({:.2f} fps)'.format(frame_id, 1. / max(1e-5, timer.average_time)))
+        t_save = time.time()
+        st_save += t_save - t_track
 
-        ch = cv2.waitKey(0)
-        if ch == 27 or ch == ord("q") or ch == ord("Q"):
-            break
+        if frame_id % 20 == 0:
+            logger.info('Processing frame {} ({:.2f} fps, det: {:.2f} fps, track: {:.2f} fps, save: {:.2f} fps)'
+                        .format(frame_id, 1. / max(1e-5, timer.average_time), 20./st_det, 20./st_track, 20./st_save))
+            st_det = 0
+            st_track = 0
+            st_save = 0
+
+        # ch = cv2.waitKey(0)
+        # if ch == 27 or ch == ord("q") or ch == ord("Q"):
+        #     break
 
     if args.save_result:
         res_file = osp.join(vis_folder, f"{timestamp}.txt")
@@ -233,21 +249,38 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
     else:
         save_path = osp.join(save_folder, "camera.mp4")
     logger.info(f"video save_path is {save_path}")
-    vid_writer = cv2.VideoWriter(
-        save_path, cv2.VideoWriter_fourcc(*"mp4v"), fps, (int(width), int(height))
-    )
+    if args.save_size is not None:
+        vid_writer = cv2.VideoWriter(
+            save_path, cv2.VideoWriter_fourcc(*"mp4v"), fps, (args.save_size[1], args.save_size[0])
+        )
+    else:
+        vid_writer = cv2.VideoWriter(
+            save_path, cv2.VideoWriter_fourcc(*"mp4v"), fps, (int(width), int(height))
+        )
     tracker = BoTSORT(args, frame_rate=args.fps)
     timer = Timer()
     frame_id = 0
     results = []
+
+    st_det = 1e-5
+    st_track = 1e-5
+    st_save = 1e-5
     while True:
         if frame_id % 20 == 0:
-            logger.info('Processing frame {} ({:.2f} fps)'.format(frame_id, 1. / max(1e-5, timer.average_time)))
+            logger.info('Processing frame {} ({:.2f} fps, det: {:.2f} fps, track: {:.2f} fps, save: {:.2f} fps)'
+                        .format(frame_id, 1. / max(1e-5, timer.average_time), 20. / st_det, 20. / st_track,
+                                20. / st_save))
+            st_det = 0
+            st_track = 0
+            st_save = 0
         ret_val, frame = cap.read()
         if ret_val:
             # Detect objects
+            t0 = time.time()
             outputs, img_info = predictor.inference(frame, timer)
             scale = min(exp.test_size[0] / float(img_info['height'], ), exp.test_size[1] / float(img_info['width']))
+            t_det = time.time()
+            st_det += t_det - t0
 
             if outputs[0] is not None:
                 outputs = outputs[0].cpu().numpy()
@@ -278,11 +311,22 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
             else:
                 timer.toc()
                 online_im = img_info['raw_img']
+            t_track = time.time()
+            st_track += t_track - t_det
+
             if args.save_result:
+                if args.save_size is not None:
+                    online_im = cv2.resize(
+                                online_im,
+                                (args.save_size[1], args.save_size[0]),
+                                interpolation=cv2.INTER_LINEAR,
+                                )
                 vid_writer.write(online_im)
-            ch = cv2.waitKey(1)
-            if ch == 27 or ch == ord("q") or ch == ord("Q"):
-                break
+            t_save = time.time()
+            st_save += t_save - t_track
+            # ch = cv2.waitKey(1)
+            # if ch == 27 or ch == ord("q") or ch == ord("Q"):
+            #     break
         else:
             break
         frame_id += 1

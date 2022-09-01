@@ -10,6 +10,8 @@ from tracker.kalman_filter import KalmanFilter
 
 from fast_reid.fast_reid_interfece import FastReIDInterface
 
+import time
+
 
 class STrack(BaseTrack):
     shared_kalman = KalmanFilter()
@@ -294,10 +296,13 @@ class BoTSORT(object):
         # Predict the current location with KF
         STrack.multi_predict(strack_pool)
 
+        t0 = time.time()
         # Fix camera motion
         warp = self.gmc.apply(img, dets)
         STrack.multi_gmc(strack_pool, warp)
         STrack.multi_gmc(unconfirmed, warp)
+        t1 = time.time()
+        # print("time: %f" % (t1 - t0))
 
         # Associate with high score detection boxes
         ious_dists = matching.iou_distance(strack_pool, detections)
