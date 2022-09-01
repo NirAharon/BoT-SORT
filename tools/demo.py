@@ -52,7 +52,7 @@ def make_parser():
 
     # CMC
     parser.add_argument("--cmc-method", default="orb", type=str, help="cmc method: files (Vidstab GMC) | orb | ecc")
-    parser.add_argument("--downscale", default=2, type=int, help="cmc downscale, large image leads to very slow gmc, increase diwnscale to increase speed")
+    parser.add_argument("--downscale", default=2, type=int, help="cmc downscale, large image leads to very slow gmc, increase downscale to increase speed")
 
     # ReID
     parser.add_argument("--with-reid", dest="with_reid", default=False, action="store_true", help="test mot20.")
