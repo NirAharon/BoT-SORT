@@ -254,7 +254,7 @@ In addition, python-based motion estimation techniques are available and can be 
 
 A large part of the codes, ideas and results are borrowed from 
 [ByteTrack](https://github.com/ifzhang/ByteTrack), 
-[StorngSORT](https://github.com/dyhBUPT/StrongSORT),
+[StrongSORT](https://github.com/dyhBUPT/StrongSORT),
 [FastReID](https://github.com/JDAI-CV/fast-reid),
 [YOLOX](https://github.com/Megvii-BaseDetection/YOLOX) and
 [YOLOv7](https://github.com/wongkinyiu/yolov7). 
