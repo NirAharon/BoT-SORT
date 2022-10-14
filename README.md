@@ -23,7 +23,7 @@
 - [ ] Trained YOLOv7 models for MOTChallenge.
 - [x] YOLOv7 detector.
 - [x] Multi-class support.
-- [ ] Create OpenCV VideoStab GMC python binding or write Python version.
+- [x] Create OpenCV VideoStab GMC python binding or <u>write Python version<u>.
 - [ ] Deployment code.
 
 ## Abstract
@@ -254,7 +254,7 @@ In addition, python-based motion estimation techniques are available and can be 
 
 A large part of the codes, ideas and results are borrowed from 
 [ByteTrack](https://github.com/ifzhang/ByteTrack), 
-[StorngSORT](https://github.com/dyhBUPT/StrongSORT),
+[StrongSORT](https://github.com/dyhBUPT/StrongSORT),
 [FastReID](https://github.com/JDAI-CV/fast-reid),
 [YOLOX](https://github.com/Megvii-BaseDetection/YOLOX) and
 [YOLOv7](https://github.com/wongkinyiu/yolov7). 

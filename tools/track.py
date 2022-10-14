@@ -55,7 +55,7 @@ def make_parser():
     parser.add_argument('--min_box_area', type=float, default=10, help='filter out tiny boxes')
 
     # CMC
-    parser.add_argument("--cmc-method", default="file", type=str, help="cmc method: files (Vidstab GMC) | orb | ecc |none")
+    parser.add_argument("--cmc-method", default="file", type=str, help="cmc method: files (Vidstab GMC) | sparseOptFlow | orb | ecc | none")
 
     # ReID
     parser.add_argument("--with-reid", dest="with_reid", default=False, action="store_true", help="use Re-ID flag.")

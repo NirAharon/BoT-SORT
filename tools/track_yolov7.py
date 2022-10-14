@@ -247,7 +247,7 @@ if __name__ == '__main__':
                         help="fuse score and iou for association")
 
     # CMC
-    parser.add_argument("--cmc-method", default="file", type=str, help="cmc method: files (Vidstab GMC) | orb | ecc")
+    parser.add_argument("--cmc-method", default="file", type=str, help="cmc method: files (Vidstab GMC) | sparseOptFlow |orb | ecc")
     parser.add_argument("--ablation", dest="ablation", default=False, action="store_true", help="ablation ")
 
     # ReID
