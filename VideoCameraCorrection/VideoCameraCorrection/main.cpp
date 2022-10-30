@@ -7,19 +7,18 @@
 #include <filesystem>
 #include <experimental/filesystem>
 
-#include "opencv2/core.hpp"
-#include "opencv2/highgui.hpp"
-#include "opencv2/video.hpp"
-#include "opencv2/videoio.hpp"
-#include "opencv2/videostab.hpp"
+#include "cmc.h"
+
 
 // --------------------------------------------
 // Global Parameters
 // --------------------------------------------
-std::string dataPath = "~/Datasets";
+std::string dataPath = "~/Datasets";  // chagne to the correct path /home/<user name>/Datasests ...
 std::string savePath = "./Results";
 int downscale = 2;
+bool ablation = false;
 
+bool WRITE_RESULTS = true;
 bool WITH_MASKING = false; // true | false
 std::string detectionsPath = "";
 
@@ -32,10 +31,10 @@ int main()
     // --------------------------------------------
     // Parameters
     // --------------------------------------------
-    int seqNumber = 2;
+    int seqNumber = 13;
     int dataNumber = 17; // 17 | 20
-    bool testSet = false;
-    bool ALL_SEQENCES = false;
+    bool testSet = false; // true | false
+    bool ALL_SEQENCES = true; // true | false
     // --------------------------------------------
 
     std::vector<int> mot17train{2, 4, 5, 9, 10, 11, 13};
@@ -43,8 +42,18 @@ int main()
     std::vector<int> mot20train{1, 2, 3, 5};
     std::vector<int> mot20test{4, 6, 7, 8};
 
-    std::vector<std::vector<int>> seqences{mot17train, mot17test, mot20train, mot20test};
-    std::vector<int> datasets{17, 17, 20, 20};
+    std::vector<std::vector<int>> seqences;
+    std::vector<int> datasets;
+    if (ablation)
+    {
+        seqences = {mot17train};
+        datasets = {17};
+    }
+    else
+    {
+        seqences = {mot17train, mot17test, mot20train, mot20test};
+        datasets = {17, 17, 20, 20};
+    }
 
     if (ALL_SEQENCES)
     {
@@ -108,10 +117,18 @@ int GMC(int dataNumber, int seqNumber, bool test)
     float detScore;
 
     int numFrames = (int)images.size();
-    cv::Mat fullFrame, frame, prevFrame;
+
+    if (ablation)
+    {
+        numFrames = numFrames / 2;
+        images = {images.begin() + numFrames + 2, images.end()};
+    }
+
+    cv::Mat fullFrame, prevFrame;
 
     cv::Ptr<cv::videostab::MotionEstimatorRansacL2> est = cv::makePtr<cv::videostab::MotionEstimatorRansacL2>(cv::videostab::MM_SIMILARITY);
     cv::Ptr<cv::videostab::KeypointBasedMotionEstimator> kbest = cv::makePtr<cv::videostab::KeypointBasedMotionEstimator>(est);
+    kbest->setDetector(cv::GFTTDetector::create(4000));
 
     if (!std::experimental::filesystem::is_directory(savePath) || !std::experimental::filesystem::exists(savePath))
     {
@@ -120,14 +137,21 @@ int GMC(int dataNumber, int seqNumber, bool test)
 
     std::ofstream outFile;
     std::string fullSavePath = savePath + "/GMC-" + dataString + "-" + seqString + ".txt";
-    outFile.open (fullSavePath);
 
+    if (WRITE_RESULTS)
+    {
+        outFile.open (fullSavePath);
+    }
     double overallTime = 0.0;
     cv::TickMeter timer;
 
-    for (int i = 0; i < numFrames; ++i)
+    cv::Mat warp = cv::Mat::eye(3, 3, CV_32F);
+    cv::Mat prevWarp;
+
+    for (int i = 0; i < (int)images.size(); ++i)
     {
-        fullFrame = cv::imread(images[i], 0);
+        std::cout << images[i] << std::endl;
+        fullFrame = cv::imread(images[i]);
 
         if (fullFrame.empty())
         {
@@ -139,9 +163,9 @@ int GMC(int dataNumber, int seqNumber, bool test)
         timer.start();
 
         cv::Size downSize(fullFrame.cols / downscale, fullFrame.rows / downscale);
+        cv::Mat frame;
         cv::resize(fullFrame, frame, downSize, cv::INTER_LINEAR);
 
-        cv::Mat warp = cv::Mat::eye(3, 3, CV_32F);
 
         if (!prevFrame.empty())
         {
@@ -187,7 +211,8 @@ int GMC(int dataNumber, int seqNumber, bool test)
                     if (detScore > 0.5)
                         mask(detRect) = 0;
                 }
-                if (i % 100 == 0)
+                //if (i % 100 == 0)
+                if (0)
                 {
                     cv::namedWindow("mask", cv::WINDOW_NORMAL);
                     cv::imshow("mask", mask);
@@ -200,40 +225,57 @@ int GMC(int dataNumber, int seqNumber, bool test)
             bool ok;
             warp = kbest->estimate(prevFrame, frame, &ok);
 
-
-            if (!ok)
+            if (ok)
             {
-                std::cout << "WARNING: Warp not ok" << std::endl;
+                warp.convertTo(warp, CV_32F);
+                warp.at<float>(0, 2) *= downscale;
+                warp.at<float>(1, 2) *= downscale;
+            }
+            else
+            {
+                std::cout << "WARNING: Warp not ok, using previous motion" << std::endl;
+                prevWarp.copyTo(warp);
             }
 
-            warp.convertTo(warp, CV_32F);
-            warp.at<float>(0, 2) *= downscale;
-            warp.at<float>(1, 2) *= downscale;
+
         }
 
         // Store last frame
         frame.copyTo(prevFrame);
+        warp.copyTo(prevWarp);
 
         timer.stop();
         overallTime += timer.getTimeMilli();
 
-        // Write result to file
-        std::string line = std::to_string(i) + "\t" +
-                std::to_string(warp.at<float>(0, 0)) + "\t" +
-                std::to_string(warp.at<float>(0, 1)) + "\t" +
-                std::to_string(warp.at<float>(0, 2)) + "\t" +
-                std::to_string(warp.at<float>(1, 0)) + "\t" +
-                std::to_string(warp.at<float>(1, 1)) + "\t" +
-                std::to_string(warp.at<float>(1, 2)) + "\t";
+        std::cout << dataString << "-" << seqString << ": ";
 
-        std::cout << line << std::endl;
-        outFile << line << std::endl;
+        // Write result to file
+        if (WRITE_RESULTS)
+        {
+            std::string line = std::to_string(i) + "\t" +
+                    std::to_string(warp.at<float>(0, 0)) + "\t" +
+                    std::to_string(warp.at<float>(0, 1)) + "\t" +
+                    std::to_string(warp.at<float>(0, 2)) + "\t" +
+                    std::to_string(warp.at<float>(1, 0)) + "\t" +
+                    std::to_string(warp.at<float>(1, 1)) + "\t" +
+                    std::to_string(warp.at<float>(1, 2)) + "\t";
+
+            std::cout << line << std::endl;
+            outFile << line << std::endl;
+        }
+        else
+        {
+            std::cout << std::endl;
+        }
     }
 
-    outFile.close();
+    if (WRITE_RESULTS)
+    {
+        outFile.close();
+        std::cout << "Saved GMC to " << fullSavePath << std::endl;
 
+    }
     std::cout << "GMC time [mSec]: " << overallTime / numFrames << std::endl;
-    std::cout << "Saved GMC to " << fullSavePath << std::endl;
 
     return 0;
 }

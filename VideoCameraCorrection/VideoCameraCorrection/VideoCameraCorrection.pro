@@ -1,7 +1,7 @@
 TEMPLATE = app
 CONFIG += console c++11
 CONFIG += -O0
-#CONFIG += -std=c++17
+CONFIG += -std=c++17
 CONFIG -= app_bundle
 CONFIG -= qt
 
@@ -20,5 +20,9 @@ LIBS += -L/usr/local/lib \
 LIBS += -lstdc++fs
 
 SOURCES += \
+        cmc.cpp \
         main.cpp
+
+HEADERS += \
+    cmc.h
 
