@@ -18,6 +18,7 @@ def setup_cfg(config_file, opts):
     cfg = get_cfg()
     cfg.merge_from_file(config_file)
     cfg.merge_from_list(opts)
+    print(opts, cfg.MODEL.DEVICE)
     cfg.MODEL.BACKBONE.PRETRAIN = False
 
     cfg.freeze()
@@ -52,15 +53,15 @@ def preprocess(image, input_size):
 class FastReIDInterface:
     def __init__(self, config_file, weights_path, device, batch_size=8):
         super(FastReIDInterface, self).__init__()
-        if device != 'cpu':
+        
+        if str(device) != 'cpu':
             self.device = 'cuda'
         else:
             self.device = 'cpu'
 
         self.batch_size = batch_size
 
-        self.cfg = setup_cfg(config_file, ['MODEL.WEIGHTS', weights_path])
-
+        self.cfg = setup_cfg(config_file, ['MODEL.WEIGHTS', weights_path, "MODEL.DEVICE", self.device])
         self.model = build_model(self.cfg)
         self.model.eval()
 
@@ -103,7 +104,10 @@ class FastReIDInterface:
 
             # Make shape with a new batch dimension which is adapted for network input
             patch = torch.as_tensor(patch.astype("float32").transpose(2, 0, 1))
-            patch = patch.to(device=self.device).half()
+            if self.device != 'cpu':
+                patch = patch.to(device=self.device).half()
+            else:
+                patch = patch.to(device=self.device)
 
             patches.append(patch)
 
