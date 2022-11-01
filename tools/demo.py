@@ -29,6 +29,7 @@ def make_parser():
     parser.add_argument("--path", default="", help="path to images or video")
     parser.add_argument("--camid", type=int, default=0, help="webcam demo camera id")
     parser.add_argument("--save_result", action="store_true",help="whether to save the inference result of image/video")
+    parser.add_argument("--save_size", default=None, type=str, help="save size of image/video, used to adjust output size")
     parser.add_argument("-f", "--exp_file", default=None, type=str, help="pls input your expriment description file")
     parser.add_argument("-c", "--ckpt", default=None, type=str, help="ckpt for eval")
     parser.add_argument("--device", default="gpu", type=str, help="device to run our model, can either be cpu or gpu")
@@ -39,6 +40,7 @@ def make_parser():
     parser.add_argument("--fp16", dest="fp16", default=False, action="store_true",help="Adopting mix precision evaluating.")
     parser.add_argument("--fuse", dest="fuse", default=False, action="store_true", help="Fuse conv and bn for testing.")
     parser.add_argument("--trt", dest="trt", default=False, action="store_true", help="Using TensorRT model for testing.")
+    parser.add_argument("--legacy", dest="legacy", default=False, action="store_true", help="legacy code, such as mean/std normalization.")
 
     # tracking args
     parser.add_argument("--track_high_thresh", type=float, default=0.6, help="tracking confidence threshold")
@@ -52,6 +54,7 @@ def make_parser():
 
     # CMC
     parser.add_argument("--cmc-method", default="orb", type=str, help="cmc method: files (Vidstab GMC) | orb | ecc")
+    parser.add_argument("--downscale", default=2, type=int, help="cmc downscale, large image leads to very slow gmc, increase downscale to increase speed")
 
     # ReID
     parser.add_argument("--with-reid", dest="with_reid", default=False, action="store_true", help="test mot20.")
@@ -94,7 +97,8 @@ class Predictor(object):
         trt_file=None,
         decoder=None,
         device=torch.device("cpu"),
-        fp16=False
+        fp16=False,
+        legacy=False
     ):
         self.model = model
         self.decoder = decoder
@@ -115,6 +119,7 @@ class Predictor(object):
             self.model = model_trt
         self.rgb_means = (0.485, 0.456, 0.406)
         self.std = (0.229, 0.224, 0.225)
+        self.legacy = legacy
 
     def inference(self, img, timer):
         img_info = {"id": 0}
@@ -129,7 +134,7 @@ class Predictor(object):
         img_info["width"] = width
         img_info["raw_img"] = img
 
-        img, ratio = preproc(img, self.test_size, self.rgb_means, self.std)
+        img, ratio = preproc(img, self.test_size, self.rgb_means, self.std, legacy=self.legacy)
         img_info["ratio"] = ratio
         img = torch.from_numpy(img).unsqueeze(0).float().to(self.device)
         if self.fp16:
@@ -156,11 +161,17 @@ def image_demo(predictor, vis_folder, current_time, args):
     timer = Timer()
     results = []
 
+    st_det = 0
+    st_track = 0
+    st_save = 0
     for frame_id, img_path in enumerate(files, 1):
 
+        t0 = time.time()
         # Detect objects
         outputs, img_info = predictor.inference(img_path, timer)
         scale = min(exp.test_size[0] / float(img_info['height'], ), exp.test_size[1] / float(img_info['width']))
+        t_det = time.time()
+        st_det += t_det - t0
 
         detections = []
         if outputs[0] is not None:
@@ -194,6 +205,9 @@ def image_demo(predictor, vis_folder, current_time, args):
             timer.toc()
             online_im = img_info['raw_img']
 
+        t_track = time.time()
+        st_track += t_track - t_det
+
         # result_image = predictor.visual(outputs[0], img_info, predictor.confthre)
         if args.save_result:
             timestamp = time.strftime("%Y_%m_%d_%H_%M_%S", current_time)
@@ -201,12 +215,19 @@ def image_demo(predictor, vis_folder, current_time, args):
             os.makedirs(save_folder, exist_ok=True)
             cv2.imwrite(osp.join(save_folder, osp.basename(img_path)), online_im)
 
-        if frame_id % 20 == 0:
-            logger.info('Processing frame {} ({:.2f} fps)'.format(frame_id, 1. / max(1e-5, timer.average_time)))
+        t_save = time.time()
+        st_save += t_save - t_track
 
-        ch = cv2.waitKey(0)
-        if ch == 27 or ch == ord("q") or ch == ord("Q"):
-            break
+        if frame_id % 20 == 0:
+            logger.info('Processing frame {} ({:.2f} fps, det: {:.2f} fps, track: {:.2f} fps, save: {:.2f} fps)'
+                        .format(frame_id, 1. / max(1e-5, timer.average_time), 20./st_det, 20./st_track, 20./st_save))
+            st_det = 0
+            st_track = 0
+            st_save = 0
+
+        # ch = cv2.waitKey(0)
+        # if ch == 27 or ch == ord("q") or ch == ord("Q"):
+        #     break
 
     if args.save_result:
         res_file = osp.join(vis_folder, f"{timestamp}.txt")
@@ -228,21 +249,38 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
     else:
         save_path = osp.join(save_folder, "camera.mp4")
     logger.info(f"video save_path is {save_path}")
-    vid_writer = cv2.VideoWriter(
-        save_path, cv2.VideoWriter_fourcc(*"mp4v"), fps, (int(width), int(height))
-    )
+    if args.save_size is not None:
+        vid_writer = cv2.VideoWriter(
+            save_path, cv2.VideoWriter_fourcc(*"mp4v"), fps, (args.save_size[1], args.save_size[0])
+        )
+    else:
+        vid_writer = cv2.VideoWriter(
+            save_path, cv2.VideoWriter_fourcc(*"mp4v"), fps, (int(width), int(height))
+        )
     tracker = BoTSORT(args, frame_rate=args.fps)
     timer = Timer()
     frame_id = 0
     results = []
+
+    st_det = 1e-5
+    st_track = 1e-5
+    st_save = 1e-5
     while True:
         if frame_id % 20 == 0:
-            logger.info('Processing frame {} ({:.2f} fps)'.format(frame_id, 1. / max(1e-5, timer.average_time)))
+            logger.info('Processing frame {} ({:.2f} fps, det: {:.2f} fps, track: {:.2f} fps, save: {:.2f} fps)'
+                        .format(frame_id, 1. / max(1e-5, timer.average_time), 20. / st_det, 20. / st_track,
+                                20. / st_save))
+            st_det = 0
+            st_track = 0
+            st_save = 0
         ret_val, frame = cap.read()
         if ret_val:
             # Detect objects
+            t0 = time.time()
             outputs, img_info = predictor.inference(frame, timer)
             scale = min(exp.test_size[0] / float(img_info['height'], ), exp.test_size[1] / float(img_info['width']))
+            t_det = time.time()
+            st_det += t_det - t0
 
             if outputs[0] is not None:
                 outputs = outputs[0].cpu().numpy()
@@ -273,11 +311,22 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
             else:
                 timer.toc()
                 online_im = img_info['raw_img']
+            t_track = time.time()
+            st_track += t_track - t_det
+
             if args.save_result:
+                if args.save_size is not None:
+                    online_im = cv2.resize(
+                                online_im,
+                                (args.save_size[1], args.save_size[0]),
+                                interpolation=cv2.INTER_LINEAR,
+                                )
                 vid_writer.write(online_im)
-            ch = cv2.waitKey(1)
-            if ch == 27 or ch == ord("q") or ch == ord("Q"):
-                break
+            t_save = time.time()
+            st_save += t_save - t_track
+            # ch = cv2.waitKey(1)
+            # if ch == 27 or ch == ord("q") or ch == ord("Q"):
+            #     break
         else:
             break
         frame_id += 1
@@ -348,7 +397,10 @@ def main(exp, args):
         trt_file = None
         decoder = None
 
-    predictor = Predictor(model, exp, trt_file, decoder, args.device, args.fp16)
+    if args.save_size is not None:
+        args.save_size = tuple(map(int, args.save_size.split(',')))
+
+    predictor = Predictor(model, exp, trt_file, decoder, args.device, args.fp16, args.legacy)
     current_time = time.localtime()
     if args.demo == "image" or args.demo == "images":
         image_demo(predictor, vis_folder, current_time, args)
