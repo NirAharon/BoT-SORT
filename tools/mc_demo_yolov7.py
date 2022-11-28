@@ -84,11 +84,13 @@ def detect(save_img=False):
     # Create tracker
     tracker = BoTSORT(opt, frame_rate=30.0)
 
+    final_results = []
+
     # Run inference
     if device.type != 'cpu':
         model(torch.zeros(1, 3, imgsz, imgsz).to(device).type_as(next(model.parameters())))  # run once
     t0 = time.time()
-    for path, img, im0s, vid_cap in dataset:
+    for frame_id, (path, img, im0s, vid_cap) in enumerate(dataset):
         img = torch.from_numpy(img).to(device)
         img = img.half() if half else img.float()  # uint8 to fp16/32
         img /= 255.0  # 0 - 255 to 0.0 - 1.0
@@ -155,6 +157,8 @@ def detect(save_img=False):
             p = Path(p)  # to Path
             save_path = str(save_dir / p.name)  # img.jpg
 
+            final_results.append((frame_id + 1, online_tlwhs, online_ids, online_scores))
+
             # Print time (inference + NMS)
             # print(f'{s}Done. ({t2 - t1:.3f}s)')
 
@@ -185,6 +189,8 @@ def detect(save_img=False):
     if save_txt or save_img:
         s = f"\n{len(list(save_dir.glob('labels/*.txt')))} labels saved to {save_dir / 'labels'}" if save_txt else ''
         # print(f"Results saved to {save_dir}{s}")
+        if save_txt:
+            write_results(save_dir / 'labels' / 'result.txt', final_results)
 
     print(f'Done. ({time.time() - t0:.3f}s)')
 
