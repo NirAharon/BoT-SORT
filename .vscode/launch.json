@@ -1,0 +1,70 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Python: Setup",
+      "type": "python",
+      "request": "launch",
+      "program": "setup.py",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "args": ["develop"]
+    },
+    {
+      "name": "Python: YoloV7 Tracking",
+      "type": "python",
+      "request": "launch",
+      "program": "mc_demo_yolov7.py",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "args": [
+        "--save-txt",
+        "--weights",
+        "${input:weights}",
+        "--source",
+        "${input:video}"
+      ]
+    },
+    {
+      "name": "Python: Interpolate",
+      "type": "python",
+      "request": "launch",
+      "program": "interpolation.py",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "args": ["--txt_path", "${input:tracks}"]
+    },
+    {
+      "name": "Python: Draw video",
+      "type": "python",
+      "request": "launch",
+      "program": "label_video.py",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "args": ["${input:tracks}"]
+    }
+  ],
+  "inputs": [
+    {
+      "id": "weights",
+      "type": "promptString",
+      "default": "/d/WORK/Trained Models/best.pt",
+      "description": "Path to weights file"
+    },
+    {
+      "id": "video",
+      "type": "promptString",
+      "default": "/d/Drone Datasets/generated dataset/footage/SWP0047_Trim.mp4",
+      "description": "Path to video file"
+    },
+    {
+      "id": "tracks",
+      "type": "promptString",
+      "default": "/d/WORK/SharedVMStorage",
+      "description": "Path to tracking text file"
+    }
+  ]
+}
