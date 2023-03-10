@@ -739,7 +739,7 @@ class ComputeLossOTA:
                 + 3.0 * pair_wise_iou_loss
             )
 
-            matching_matrix = torch.zeros_like(cost)
+            matching_matrix = torch.zeros_like(cost, device="cpu")
 
             for gt_idx in range(num_gt):
                 _, pos_idx = torch.topk(
@@ -1066,7 +1066,7 @@ class ComputeLossBinOTA:
                 + 3.0 * pair_wise_iou_loss
             )
 
-            matching_matrix = torch.zeros_like(cost)
+            matching_matrix = torch.zeros_like(cost, device="cpu")
 
             for gt_idx in range(num_gt):
                 _, pos_idx = torch.topk(
@@ -1384,7 +1384,7 @@ class ComputeLossAuxOTA:
                 + 3.0 * pair_wise_iou_loss
             )
 
-            matching_matrix = torch.zeros_like(cost)
+            matching_matrix = torch.zeros_like(cost, device="cpu")
 
             for gt_idx in range(num_gt):
                 _, pos_idx = torch.topk(
@@ -1537,7 +1537,7 @@ class ComputeLossAuxOTA:
                 + 3.0 * pair_wise_iou_loss
             )
 
-            matching_matrix = torch.zeros_like(cost)
+            matching_matrix = torch.zeros_like(cost, device="cpu")
 
             for gt_idx in range(num_gt):
                 _, pos_idx = torch.topk(
