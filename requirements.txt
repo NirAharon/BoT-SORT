@@ -1,5 +1,5 @@
 numpy
-opencv-python
+opencv-python-headless
 loguru
 scikit-image
 scikit-learn
