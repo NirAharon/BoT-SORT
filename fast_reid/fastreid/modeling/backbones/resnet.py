@@ -10,15 +10,15 @@ import math
 import torch
 from torch import nn
 
-from fast_reid.fastreid.layers import (
+from fastreid.layers import (
     IBN,
     SELayer,
     Non_local,
     get_norm,
 )
-from fast_reid.fastreid.utils.checkpoint import get_missing_parameters_message, get_unexpected_parameters_message
+from fastreid.utils.checkpoint import get_missing_parameters_message, get_unexpected_parameters_message
 from .build import BACKBONE_REGISTRY
-from fast_reid.fastreid.utils import comm
+from fastreid.utils import comm
 
 
 logger = logging.getLogger(__name__)

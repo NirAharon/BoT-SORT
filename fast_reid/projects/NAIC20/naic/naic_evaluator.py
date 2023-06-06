@@ -13,10 +13,10 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 
-from fast_reid.fastreid.evaluation import ReidEvaluator
-from fast_reid.fastreid.evaluation.query_expansion import aqe
-from fast_reid.fastreid.utils import comm
-from fast_reid.fastreid.utils.compute_dist import build_dist
+from fastreid.evaluation import ReidEvaluator
+from fastreid.evaluation.query_expansion import aqe
+from fastreid.utils import comm
+from fastreid.utils.compute_dist import build_dist
 
 logger = logging.getLogger("fastreid.naic_submission")
 

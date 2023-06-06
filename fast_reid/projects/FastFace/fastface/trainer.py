@@ -10,17 +10,17 @@ import time
 from torch.nn.parallel import DistributedDataParallel
 from torch.nn.utils import clip_grad_norm_
 
-from fast_reid.fastreid.data.build import _root, build_reid_test_loader, build_reid_train_loader
-from fast_reid.fastreid.data.datasets import DATASET_REGISTRY
-from fast_reid.fastreid.data.transforms import build_transforms
-from fast_reid.fastreid.engine import hooks
-from fast_reid.fastreid.engine.defaults import DefaultTrainer, TrainerBase
-from fast_reid.fastreid.engine.train_loop import SimpleTrainer, AMPTrainer
-from fast_reid.fastreid.solver import build_optimizer
-from fast_reid.fastreid.utils import comm
-from fast_reid.fastreid.utils.checkpoint import Checkpointer
-from fast_reid.fastreid.utils.logger import setup_logger
-from fast_reid.fastreid.utils.params import ContiguousParams
+from fastreid.data.build import _root, build_reid_test_loader, build_reid_train_loader
+from fastreid.data.datasets import DATASET_REGISTRY
+from fastreid.data.transforms import build_transforms
+from fastreid.engine import hooks
+from fastreid.engine.defaults import DefaultTrainer, TrainerBase
+from fastreid.engine.train_loop import SimpleTrainer, AMPTrainer
+from fastreid.solver import build_optimizer
+from fastreid.utils import comm
+from fastreid.utils.checkpoint import Checkpointer
+from fastreid.utils.logger import setup_logger
+from fastreid.utils.params import ContiguousParams
 from .face_data import MXFaceDataset
 from .face_data import TestFaceDataset
 from .face_evaluator import FaceEvaluator

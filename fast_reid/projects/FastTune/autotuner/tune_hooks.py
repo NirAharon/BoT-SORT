@@ -7,8 +7,8 @@
 import torch
 from ray import tune
 
-from fast_reid.fastreid.engine.hooks import EvalHook, flatten_results_dict
-from fast_reid.fastreid.utils.checkpoint import Checkpointer
+from fastreid.engine.hooks import EvalHook, flatten_results_dict
+from fastreid.utils.checkpoint import Checkpointer
 
 
 class TuneReportHook(EvalHook):

@@ -15,8 +15,8 @@ from yolox.exp import get_exp
 from yolox.utils import fuse_model, get_model_info, postprocess
 from yolox.utils.visualize import plot_tracking
 
-from tracker.mc_bot_sort import BoTSORT
-from tracker.tracking_utils.timer import Timer
+from botracker.mc_bot_sort import BoTSORT
+from botracker.tracking_utils.timer import Timer
 
 
 IMAGE_EXT = [".jpg", ".jpeg", ".webp", ".bmp", ".png"]

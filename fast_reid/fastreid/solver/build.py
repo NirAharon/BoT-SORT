@@ -15,8 +15,8 @@ from typing import Any, Callable, Dict, Iterable, List, Optional, Set, Type, Uni
 
 import torch
 
-from fast_reid.fastreid.config import CfgNode
-from fast_reid.fastreid.utils.params import ContiguousParams
+from fastreid.config import CfgNode
+from fastreid.utils.params import ContiguousParams
 from . import lr_scheduler
 
 _GradientClipperInput = Union[torch.Tensor, Iterable[torch.Tensor]]

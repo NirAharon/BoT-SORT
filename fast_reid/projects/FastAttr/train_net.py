@@ -8,14 +8,14 @@ import sys
 
 sys.path.append('.')
 
-from fast_reid.fastreid.config import get_cfg
-from fast_reid.fastreid.engine import DefaultTrainer
-from fast_reid.fastreid.engine import default_argument_parser, default_setup, launch
-from fast_reid.fastreid.utils.checkpoint import Checkpointer
-from fast_reid.fastreid.data.datasets import DATASET_REGISTRY
-from fast_reid.fastreid.data.build import _root, build_reid_train_loader, build_reid_test_loader
-from fast_reid.fastreid.data.transforms import build_transforms
-from fast_reid.fastreid.utils import comm
+from fastreid.config import get_cfg
+from fastreid.engine import DefaultTrainer
+from fastreid.engine import default_argument_parser, default_setup, launch
+from fastreid.utils.checkpoint import Checkpointer
+from fastreid.data.datasets import DATASET_REGISTRY
+from fastreid.data.build import _root, build_reid_train_loader, build_reid_test_loader
+from fastreid.data.transforms import build_transforms
+from fastreid.utils import comm
 
 from fastattr import *
 

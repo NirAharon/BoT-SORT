@@ -14,8 +14,8 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 
-from fast_reid.fastreid.evaluation import DatasetEvaluator
-from fast_reid.fastreid.utils import comm
+from fastreid.evaluation import DatasetEvaluator
+from fastreid.utils import comm
 
 logger = logging.getLogger("fastreid.retri_evaluator")
 

@@ -15,9 +15,9 @@ import torch
 import torch.nn.functional as F
 from PIL import Image
 
-from fast_reid.fastreid.evaluation import DatasetEvaluator
-from fast_reid.fastreid.utils import comm
-from fast_reid.fastreid.utils.file_io import PathManager
+from fastreid.evaluation import DatasetEvaluator
+from fastreid.utils import comm
+from fastreid.utils.file_io import PathManager
 from .verification import evaluate
 
 logger = logging.getLogger("fastreid.face_evaluator")

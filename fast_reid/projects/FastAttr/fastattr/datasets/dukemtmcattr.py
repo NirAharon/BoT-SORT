@@ -10,7 +10,7 @@ import re
 import mat4py
 import numpy as np
 
-from fast_reid.fastreid.data.datasets import DATASET_REGISTRY
+from fastreid.data.datasets import DATASET_REGISTRY
 
 from .bases import Dataset
 

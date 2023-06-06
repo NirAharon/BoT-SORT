@@ -13,11 +13,11 @@ import torch
 sys.path.append('.')
 
 import pytorch_to_caffe
-from fast_reid.fastreid.config import get_cfg
-from fast_reid.fastreid.modeling.meta_arch import build_model
-from fast_reid.fastreid.utils.file_io import PathManager
-from fast_reid.fastreid.utils.checkpoint import Checkpointer
-from fast_reid.fastreid.utils.logger import setup_logger
+from fastreid.config import get_cfg
+from fastreid.modeling.meta_arch import build_model
+from fastreid.utils.file_io import PathManager
+from fastreid.utils.checkpoint import Checkpointer
+from fastreid.utils.logger import setup_logger
 
 # import some modules added in project like this below
 # sys.path.append("projects/PartialReID")

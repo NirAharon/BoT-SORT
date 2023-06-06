@@ -14,7 +14,7 @@ except ImportError:
     except ImportError:
         from torch.utils.model_zoo import load_url as load_state_dict_from_url
 
-from fast_reid.fastreid.layers import get_norm
+from fastreid.layers import get_norm
 from .build import BACKBONE_REGISTRY
 from .mobilenet import _make_divisible
 

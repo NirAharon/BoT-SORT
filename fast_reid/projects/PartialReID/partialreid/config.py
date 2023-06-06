@@ -4,7 +4,7 @@
 @contact: sherlockliao01@gmail.com
 """
 
-from fast_reid.fastreid.config import CfgNode as CN
+from fastreid.config import CfgNode as CN
 
 
 def add_partialreid_config(cfg):

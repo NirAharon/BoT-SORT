@@ -4,8 +4,8 @@
 @contact: sherlockliao01@gmail.com
 """
 
-from fast_reid.fastreid.modeling.meta_arch.baseline import Baseline
-from fast_reid.fastreid.modeling.meta_arch.build import META_ARCH_REGISTRY
+from fastreid.modeling.meta_arch.baseline import Baseline
+from fastreid.modeling.meta_arch.build import META_ARCH_REGISTRY
 from .bce_loss import cross_entropy_sigmoid_loss
 
 

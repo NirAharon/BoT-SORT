@@ -12,9 +12,9 @@ import logging
 import torch
 from torch import nn
 
-from fast_reid.fastreid.layers import get_norm
-from fast_reid.fastreid.utils import comm
-from fast_reid.fastreid.utils.checkpoint import get_missing_parameters_message, get_unexpected_parameters_message
+from fastreid.layers import get_norm
+from fastreid.utils import comm
+from fastreid.utils.checkpoint import get_missing_parameters_message, get_unexpected_parameters_message
 from .build import BACKBONE_REGISTRY
 
 logger = logging.getLogger(__name__)

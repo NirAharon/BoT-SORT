@@ -6,7 +6,7 @@
 import torch
 import torch.nn.functional as F
 
-from fast_reid.fastreid.utils.events import get_event_storage
+from fastreid.utils.events import get_event_storage
 
 
 def log_accuracy(pred_class_logits, gt_classes, topk=(1,)):

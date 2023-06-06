@@ -9,7 +9,7 @@ import os.path as osp
 import numpy as np
 from scipy.io import loadmat
 
-from fast_reid.fastreid.data.datasets import DATASET_REGISTRY
+from fastreid.data.datasets import DATASET_REGISTRY
 
 from .bases import Dataset
 

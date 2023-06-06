@@ -17,18 +17,18 @@ from collections import OrderedDict
 import torch
 from torch.nn.parallel import DistributedDataParallel
 
-from fast_reid.fastreid.data import build_reid_test_loader, build_reid_train_loader
-from fast_reid.fastreid.evaluation import (ReidEvaluator,
+from fastreid.data import build_reid_test_loader, build_reid_train_loader
+from fastreid.evaluation import (ReidEvaluator,
                                  inference_on_dataset, print_csv_format)
-from fast_reid.fastreid.modeling.meta_arch import build_model
-from fast_reid.fastreid.solver import build_lr_scheduler, build_optimizer
-from fast_reid.fastreid.utils import comm
-from fast_reid.fastreid.utils.checkpoint import Checkpointer
-from fast_reid.fastreid.utils.collect_env import collect_env_info
-from fast_reid.fastreid.utils.env import seed_all_rng
-from fast_reid.fastreid.utils.events import CommonMetricPrinter, JSONWriter, TensorboardXWriter
-from fast_reid.fastreid.utils.file_io import PathManager
-from fast_reid.fastreid.utils.logger import setup_logger
+from fastreid.modeling.meta_arch import build_model
+from fastreid.solver import build_lr_scheduler, build_optimizer
+from fastreid.utils import comm
+from fastreid.utils.checkpoint import Checkpointer
+from fastreid.utils.collect_env import collect_env_info
+from fastreid.utils.env import seed_all_rng
+from fastreid.utils.events import CommonMetricPrinter, JSONWriter, TensorboardXWriter
+from fastreid.utils.file_io import PathManager
+from fastreid.utils.logger import setup_logger
 from . import hooks
 from .train_loop import TrainerBase, AMPTrainer, SimpleTrainer
 

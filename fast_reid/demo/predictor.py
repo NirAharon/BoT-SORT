@@ -12,7 +12,7 @@ import cv2
 import torch
 import torch.multiprocessing as mp
 
-from fast_reid.fastreid.engine import DefaultPredictor
+from fastreid.engine import DefaultPredictor
 
 try:
     mp.set_start_method('spawn')

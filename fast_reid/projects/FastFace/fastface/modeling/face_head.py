@@ -4,9 +4,9 @@
 @contact: sherlockliao01@gmail.com
 """
 
-from fast_reid.fastreid.config import configurable
-from fast_reid.fastreid.modeling.heads import EmbeddingHead
-from fast_reid.fastreid.modeling.heads.build import REID_HEADS_REGISTRY
+from fastreid.config import configurable
+from fastreid.modeling.heads import EmbeddingHead
+from fastreid.modeling.heads.build import REID_HEADS_REGISTRY
 
 
 @REID_HEADS_REGISTRY.register()

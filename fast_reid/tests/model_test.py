@@ -4,9 +4,9 @@ import torch
 
 import sys
 sys.path.append('.')
-from fast_reid.fastreid.config import cfg
-from fast_reid.fastreid.modeling.backbones import build_resnet_backbone
-from fast_reid.fastreid.modeling.backbones.resnet_ibn_a import se_resnet101_ibn_a
+from fastreid.config import cfg
+from fastreid.modeling.backbones import build_resnet_backbone
+from fastreid.modeling.backbones.resnet_ibn_a import se_resnet101_ibn_a
 from torch import nn
 
 

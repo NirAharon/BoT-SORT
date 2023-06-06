@@ -12,7 +12,7 @@ from typing import Optional, List
 import numpy as np
 from torch.utils.data.sampler import Sampler
 
-from fast_reid.fastreid.utils import comm
+from fastreid.utils import comm
 
 
 def no_index(a, b):

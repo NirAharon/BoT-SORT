@@ -12,7 +12,7 @@ import numbers
 import torch
 from torch.utils.data import Dataset
 
-from fast_reid.fastreid.data.common import CommDataset
+from fastreid.data.common import CommDataset
 
 logger = logging.getLogger("fastreid.face_data")
 

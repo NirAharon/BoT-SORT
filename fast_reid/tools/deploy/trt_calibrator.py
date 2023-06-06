@@ -23,12 +23,12 @@ import torchvision.transforms as T
 
 sys.path.append('../..')
 
-from fast_reid.fastreid.data.build import _root
-from fast_reid.fastreid.data.data_utils import read_image
-from fast_reid.fastreid.data.datasets import DATASET_REGISTRY
+from fastreid.data.build import _root
+from fastreid.data.data_utils import read_image
+from fastreid.data.datasets import DATASET_REGISTRY
 import logging
 
-from fast_reid.fastreid.data.transforms import ToTensor
+from fastreid.data.transforms import ToTensor
 
 
 logger = logging.getLogger('trt_export.calibrator')

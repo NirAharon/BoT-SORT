@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import sys
 
 sys.path.append('.')
-from fast_reid.fastreid.utils.visualizer import Visualizer
+from fastreid.utils.visualizer import Visualizer
 
 if __name__ == "__main__":
     baseline_res = Visualizer.load_roc_info("logs/duke_vis/roc_info.pickle")

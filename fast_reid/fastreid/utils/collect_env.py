@@ -153,6 +153,6 @@ if __name__ == "__main__":
     except ImportError:
         print(collect_env_info())
     else:
-        from fast_reid.fastreid.utils.collect_env import collect_env_info
+        from fastreid.utils.collect_env import collect_env_info
 
         print(collect_env_info())

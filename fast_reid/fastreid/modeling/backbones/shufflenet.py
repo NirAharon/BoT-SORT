@@ -7,10 +7,10 @@ import torch
 from torch import nn
 from collections import OrderedDict
 import logging
-from fast_reid.fastreid.utils.checkpoint import get_missing_parameters_message, get_unexpected_parameters_message
+from fastreid.utils.checkpoint import get_missing_parameters_message, get_unexpected_parameters_message
 
-from fast_reid.fastreid.layers import get_norm
-from fast_reid.fastreid.modeling.backbones import BACKBONE_REGISTRY
+from fastreid.layers import get_norm
+from fastreid.modeling.backbones import BACKBONE_REGISTRY
 
 logger = logging.getLogger(__name__)
 

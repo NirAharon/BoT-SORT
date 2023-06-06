@@ -6,8 +6,8 @@ from contextlib import contextmanager
 
 import torch
 
-from fast_reid.fastreid.utils import comm
-from fast_reid.fastreid.utils.logger import log_every_n_seconds
+from fastreid.utils import comm
+from fastreid.utils.logger import log_every_n_seconds
 
 
 class DatasetEvaluator:

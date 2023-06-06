@@ -8,9 +8,9 @@ import torch
 import torch.nn.functional as F
 from torch import nn
 
-from fast_reid.fastreid.modeling.heads import EmbeddingHead
-from fast_reid.fastreid.modeling.heads.build import REID_HEADS_REGISTRY
-from fast_reid.fastreid.layers.weight_init import weights_init_kaiming
+from fastreid.modeling.heads import EmbeddingHead
+from fastreid.modeling.heads.build import REID_HEADS_REGISTRY
+from fastreid.layers.weight_init import weights_init_kaiming
 
 
 @REID_HEADS_REGISTRY.register()

@@ -9,9 +9,9 @@ import logging
 import torch
 import torch.nn.functional as F
 
-from fast_reid.fastreid.config import get_cfg
-from fast_reid.fastreid.modeling.meta_arch import META_ARCH_REGISTRY, build_model, Baseline
-from fast_reid.fastreid.utils.checkpoint import Checkpointer
+from fastreid.config import get_cfg
+from fastreid.modeling.meta_arch import META_ARCH_REGISTRY, build_model, Baseline
+from fastreid.utils.checkpoint import Checkpointer
 
 logger = logging.getLogger(__name__)
 

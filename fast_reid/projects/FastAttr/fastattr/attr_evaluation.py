@@ -9,8 +9,8 @@ from collections import OrderedDict
 
 import torch
 
-from fast_reid.fastreid.evaluation.evaluator import DatasetEvaluator
-from fast_reid.fastreid.utils import comm
+from fastreid.evaluation.evaluator import DatasetEvaluator
+from fastreid.utils import comm
 
 logger = logging.getLogger("fastreid.attr_evaluation")
 

@@ -9,8 +9,8 @@ import math
 import torch
 from torch import nn
 
-from fast_reid.fastreid.layers import SplAtConv2d, get_norm, DropBlock2D
-from fast_reid.fastreid.utils.checkpoint import get_unexpected_parameters_message, get_missing_parameters_message
+from fastreid.layers import SplAtConv2d, get_norm, DropBlock2D
+from fastreid.utils.checkpoint import get_unexpected_parameters_message, get_missing_parameters_message
 from .build import BACKBONE_REGISTRY
 
 logger = logging.getLogger(__name__)

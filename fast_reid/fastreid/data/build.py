@@ -11,8 +11,8 @@ import torch
 from torch._six import string_classes
 from collections import Mapping
 
-from fast_reid.fastreid.config import configurable
-from fast_reid.fastreid.utils import comm
+from fastreid.config import configurable
+from fastreid.utils import comm
 from . import samplers
 from .common import CommDataset
 from .data_utils import DataLoaderX

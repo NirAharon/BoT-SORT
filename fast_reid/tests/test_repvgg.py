@@ -4,8 +4,8 @@ import unittest
 import torch
 
 sys.path.append('.')
-from fast_reid.fastreid.config import get_cfg
-from fast_reid.fastreid.modeling.backbones import build_backbone
+from fastreid.config import get_cfg
+from fastreid.modeling.backbones import build_backbone
 
 
 class MyTestCase(unittest.TestCase):

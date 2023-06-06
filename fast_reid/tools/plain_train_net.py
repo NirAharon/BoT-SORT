@@ -14,16 +14,16 @@ from torch.nn.parallel import DistributedDataParallel
 
 sys.path.append('.')
 
-from fast_reid.fastreid.config import get_cfg
-from fast_reid.fastreid.data import build_reid_test_loader, build_reid_train_loader
-from fast_reid.fastreid.evaluation.testing import flatten_results_dict
-from fast_reid.fastreid.engine import default_argument_parser, default_setup, launch
-from fast_reid.fastreid.modeling import build_model
-from fast_reid.fastreid.solver import build_lr_scheduler, build_optimizer
-from fast_reid.fastreid.evaluation import inference_on_dataset, print_csv_format, ReidEvaluator
-from fast_reid.fastreid.utils.checkpoint import Checkpointer, PeriodicCheckpointer
-from fast_reid.fastreid.utils import comm
-from fast_reid.fastreid.utils.events import (
+from fastreid.config import get_cfg
+from fastreid.data import build_reid_test_loader, build_reid_train_loader
+from fastreid.evaluation.testing import flatten_results_dict
+from fastreid.engine import default_argument_parser, default_setup, launch
+from fastreid.modeling import build_model
+from fastreid.solver import build_lr_scheduler, build_optimizer
+from fastreid.evaluation import inference_on_dataset, print_csv_format, ReidEvaluator
+from fastreid.utils.checkpoint import Checkpointer, PeriodicCheckpointer
+from fastreid.utils import comm
+from fastreid.utils.events import (
     CommonMetricPrinter,
     EventStorage,
     JSONWriter,

@@ -15,13 +15,13 @@ from torch.backends import cudnn
 
 sys.path.append('.')
 
-# from fast_reid.fastreid.evaluation import evaluate_rank
-from fast_reid.fastreid.evaluation.rank import evaluate_rank
-from fast_reid.fastreid.config import get_cfg
-from fast_reid.fastreid.utils.logger import setup_logger
-from fast_reid.fastreid.data import build_reid_test_loader
+# from fastreid.evaluation import evaluate_rank
+from fastreid.evaluation.rank import evaluate_rank
+from fastreid.config import get_cfg
+from fastreid.utils.logger import setup_logger
+from fastreid.data import build_reid_test_loader
 from predictor import FeatureExtractionDemo
-from fast_reid.fastreid.utils.visualizer import Visualizer
+from fastreid.utils.visualizer import Visualizer
 
 # import some modules added in project
 # for example, add partial reid like this below

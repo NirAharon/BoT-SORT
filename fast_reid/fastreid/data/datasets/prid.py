@@ -6,8 +6,8 @@
 
 import os
 
-from fast_reid.fastreid.data.datasets import DATASET_REGISTRY
-from fast_reid.fastreid.data.datasets.bases import ImageDataset
+from fastreid.data.datasets import DATASET_REGISTRY
+from fastreid.data.datasets.bases import ImageDataset
 
 __all__ = ['PRID', ]
 

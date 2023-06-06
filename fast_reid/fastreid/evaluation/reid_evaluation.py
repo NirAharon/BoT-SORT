@@ -14,8 +14,8 @@ import torch
 import torch.nn.functional as F
 from sklearn import metrics
 
-from fast_reid.fastreid.utils import comm
-from fast_reid.fastreid.utils.compute_dist import build_dist
+from fastreid.utils import comm
+from fastreid.utils.compute_dist import build_dist
 from .evaluator import DatasetEvaluator
 from .query_expansion import aqe
 from .rank_cylib import compile_helper

@@ -11,9 +11,9 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 
-from fast_reid.fastreid.evaluation.evaluator import DatasetEvaluator
-from fast_reid.fastreid.evaluation.rank import evaluate_rank
-from fast_reid.fastreid.utils import comm
+from fastreid.evaluation.evaluator import DatasetEvaluator
+from fastreid.evaluation.rank import evaluate_rank
+from fastreid.utils import comm
 from .dsr_distance import compute_dsr_dist
 
 logger = logging.getLogger('fastreid.partialreid.dsr_evaluation')

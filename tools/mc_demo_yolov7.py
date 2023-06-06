@@ -16,8 +16,8 @@ from yolov7.utils.general import check_img_size, check_requirements, check_imsho
 from yolov7.utils.plots import plot_one_box
 from yolov7.utils.torch_utils import select_device, load_classifier, time_synchronized, TracedModel
 
-from tracker.mc_bot_sort import BoTSORT
-from tracker.tracking_utils.timer import Timer
+from botracker.mc_bot_sort import BoTSORT
+from botracker.tracking_utils.timer import Timer
 
 sys.path.insert(0, './yolov7')
 sys.path.append('.')

@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: fastreid
-Version: 1.4.0
+Version: 1.4.10
 Summary: SOTA Re-identification Methods and Toolbox
 Home-page: https://github.com/JDAI-CV/fast-reid
 License: Apache 2.0

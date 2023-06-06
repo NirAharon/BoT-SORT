@@ -9,8 +9,8 @@ import os
 import bcolz
 import numpy as np
 
-from fast_reid.fastreid.data.datasets import DATASET_REGISTRY
-from fast_reid.fastreid.data.datasets.bases import ImageDataset
+from fastreid.data.datasets import DATASET_REGISTRY
+from fastreid.data.datasets.bases import ImageDataset
 
 __all__ = ["CPLFW", "VGG2_FP", "AgeDB_30", "CALFW", "CFP_FF", "CFP_FP", "LFW"]
 
