@@ -1,0 +1,5 @@
+recursive-include botracker/GMC_files/ *.txt
+
+include pyproject.toml
+
+gragt botracker/*
