@@ -1,4 +1,5 @@
 import numpy as np
+import importlib
 from collections import deque
 
 from botracker import matching
@@ -6,7 +7,8 @@ from botracker.gmc import GMC
 from botracker.basetrack import BaseTrack, TrackState
 from botracker.kalman_filter import KalmanFilter
 
-from botracker.fast_reid_interfece import FastReIDInterface
+if importlib.util.find_spec('fastreid') is not None:
+    from botracker.fast_reid_interfece import FastReIDInterface
 
 
 class STrack(BaseTrack):
