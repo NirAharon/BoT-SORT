@@ -1,12 +1,13 @@
 import numpy as np
 from collections import deque
-
+import importlib
 from botracker import matching
 from botracker.gmc import GMC
 from botracker.basetrack import BaseTrack, TrackState
 from botracker.kalman_filter import KalmanFilter
 
-from fast_reid.fast_reid_interfece import FastReIDInterface
+if importlib.util.find_spec('fastreid') is not None:
+    from fast_reid.fast_reid_interfece import FastReIDInterface
 
 
 class STrack(BaseTrack):
@@ -246,7 +247,7 @@ class BoTSORT(object):
         self.proximity_thresh = args.proximity_thresh
         self.appearance_thresh = args.appearance_thresh
 
-        if args.with_reid:
+        if args.with_reid and importlib.util.find_spec('fastreid') is not None:
             self.encoder = FastReIDInterface(args.fast_reid_config, args.fast_reid_weights, args.device)
 
         self.gmc = GMC(method=args.cmc_method, verbose=[args.name, args.ablation])

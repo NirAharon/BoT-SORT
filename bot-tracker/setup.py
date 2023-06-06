@@ -14,8 +14,6 @@ if __name__ == "__main__":
         "motmetrics",
         "cython_bbox",
         "matplotlib",
-        "fastreid==1.4.100",
-        "tensorboard==2.11.2",
     ]
 
     # final setup
