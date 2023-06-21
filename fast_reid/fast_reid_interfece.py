@@ -10,6 +10,7 @@ from fast_reid.fastreid.modeling.meta_arch import build_model
 from fast_reid.fastreid.utils.checkpoint import Checkpointer
 from fast_reid.fastreid.engine import DefaultTrainer, default_argument_parser, default_setup, launch
 
+from sc_levit import get_levit
 # cudnn.benchmark = True
 
 
@@ -61,13 +62,20 @@ class FastReIDInterface:
 
         self.cfg = setup_cfg(config_file, ['MODEL.WEIGHTS', weights_path])
 
-        self.model = build_model(self.cfg)
-        self.model.eval()
+        # self.model = build_model(self.cfg)
+        # self.model.eval()
 
-        Checkpointer(self.model).load(weights_path)
 
+        self.model = get_levit('levit_384', pretrained=True, feature_dim=8192)
+
+        self.ckpt_file = './levit_model/checkpoint_epoch_50.th'
+
+        Checkpointer(self.model).load(self.ckpt_file)
+
+        #Checkpointer(self.model).load(weights_path)
+        
         if self.device != 'cpu':
-            self.model = self.model.eval().to(device='cuda').half()
+            self.model = self.model.eval().to(device='cuda')
         else:
             self.model = self.model.eval()
 
@@ -103,7 +111,7 @@ class FastReIDInterface:
 
             # Make shape with a new batch dimension which is adapted for network input
             patch = torch.as_tensor(patch.astype("float32").transpose(2, 0, 1))
-            patch = patch.to(device=self.device).half()
+            patch = patch.to(device=self.device)
 
             patches.append(patch)
 
@@ -116,8 +124,9 @@ class FastReIDInterface:
             patches = torch.stack(patches, dim=0)
             batch_patches.append(patches)
 
-        features = np.zeros((0, 2048))
+        #features = np.zeros((0, 2048))
         # features = np.zeros((0, 768))
+        features = np.zeros((0,8192))
 
         for patches in batch_patches:
 
@@ -141,10 +150,9 @@ class FastReIDInterface:
                         patch_np = torch.permute(patch_np, (1, 2, 0)).int()
                         patch_np = patch_np.numpy()
 
-                        plt.figure()
-                        plt.imshow(patch_np)
-                        plt.show()
-
+                        # plt.figure()
+                        # plt.imshow(patch_np)
+                        # plt.show()
             features = np.vstack((features, feat))
 
         return features

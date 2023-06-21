@@ -222,7 +222,7 @@ class Checkpointer(object):
         Args:
             checkpoint (Any): checkpoint contains the weights.
         """
-        checkpoint_state_dict = checkpoint.pop("model")
+        checkpoint_state_dict = checkpoint.pop("state_dict")
         self._convert_ndarray_to_tensor(checkpoint_state_dict)
 
         # if the state_dict comes from a model that was wrapped in a
