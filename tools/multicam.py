@@ -59,21 +59,16 @@ class MultiCameraTracking:
                 # if result[0][0] < 100:
 
                 #Adding track to database
-
-                print(self.num)
                 query = 'INSERT INTO detections (id, cam_id, track_id, x, y, width, height, person_id, embedding) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)'
                 self.conn.execute(query, (self.num, cam_id, track.track_id, x, y, width, height, track.track_id, track.curr_feat.astype(np.float32)))
 
-                #if there is more than one track in the database then proceed
-
-                if self.num > 0:
+                if self.num > 0: #if there is more than one track in the database then proceed
                     
                     query_vector = track.curr_feat.astype(np.float32)
                     #print(i)
                     #query = 'SELECT person_id, embedding, embedding::vector <-> %s::vector AS distance FROM detections WHERE cam_id != %s ORDER BY embedding::vector <-> %s::vector LIMIT 20'
                     
                     #query to select the most common person id under a certain threshold
-
                     most_common = 'SELECT person_id, COUNT(*) AS count \
                             FROM (SELECT person_id, embedding, embedding::vector <-> %s::vector AS distance FROM detections \
                             WHERE cam_id != %s AND embedding::vector <-> %s::vector < %s ORDER BY embedding::vector <-> %s::vector LIMIT 101) \
