@@ -14,13 +14,6 @@ from collections import Counter
 class MultiCameraTracking:
     def __init__(self, args, frame_rate=30,time_window=50, global_match_thresh=0.35):
 
-        # self.time = 0
-        # self.last_global_id = 0
-        # self.global_ids_queue = queue.Queue()
-        # assert time_window >= 1
-        # self.time_window = time_window  # should be greater than time window in scts
-        # assert 0 <= global_match_thresh <= 1
-        # self.global_match_thresh = global_match_thresh
         num_sources = len(args.path)
         # #self.all_tracks = {}
         #self.cam_id_list = []
@@ -32,17 +25,13 @@ class MultiCameraTracking:
         self.frame_id = 0
         self.person_id = 0
         
-        # d = 8192 
-        
-        # for i in range(num_sources): 
-        #     index = faiss.IndexFlatL2(d)
-        #     self.indexes.append(index) 
-        # print(self.indexes)
 
         for i in range(num_sources):
             self.trackers.append(BoTSORT(args, frame_rate=args.fps))
         print(self.trackers)
 
+        
+        #creating database and table
 
         self.conn = psycopg.connect(dbname='testdb', autocommit=True)
         self.conn.execute('CREATE EXTENSION IF NOT EXISTS vector')
@@ -68,43 +57,53 @@ class MultiCameraTracking:
 
                 # result = self.conn.execute(query).fetchall()
                 # if result[0][0] < 100:
+
+                #Adding track to database
+
                 print(self.num)
                 query = 'INSERT INTO detections (id, cam_id, track_id, x, y, width, height, person_id, embedding) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)'
                 self.conn.execute(query, (self.num, cam_id, track.track_id, x, y, width, height, track.track_id, track.curr_feat.astype(np.float32)))
+
+                #if there is more than one track in the database then proceed
 
                 if self.num > 0:
                     
                     query_vector = track.curr_feat.astype(np.float32)
                     #print(i)
                     #query = 'SELECT person_id, embedding, embedding::vector <-> %s::vector AS distance FROM detections WHERE cam_id != %s ORDER BY embedding::vector <-> %s::vector LIMIT 20'
-                    query = 'SELECT person_id, COUNT(*) AS count \
+                    
+                    #query to select the most common person id under a certain threshold
+
+                    most_common = 'SELECT person_id, COUNT(*) AS count \
                             FROM (SELECT person_id, embedding, embedding::vector <-> %s::vector AS distance FROM detections \
                             WHERE cam_id != %s AND embedding::vector <-> %s::vector < %s ORDER BY embedding::vector <-> %s::vector LIMIT 101) \
                             AS subquery \
                             GROUP BY person_id \
                             ORDER BY count DESC \
                             LIMIT 1;'
-                    result = self.conn.execute(query, (query_vector, cam_id, query_vector, 0.01, query_vector)).fetchall()
-                    print(result)
+                    most_common_result = self.conn.execute(most_common, (query_vector, cam_id, query_vector, 0.01, query_vector)).fetchall()
+                    print(most_common_result)
                     #track_ids = [row[0] for row in result if row[2] <= 0.01]
 
-                    if len(result) <= 0:
-                        query = 'SELECT DISTINCT cam_id from detections'
-                        result = self.conn.execute(query).fetchall()
-                        if len(result) > 1:
-                            query = 'SELECT max(person_id) FROM detections WHERE id != %s'
-                            result = self.conn.execute(query,(self.num,)).fetchall()
-                            self.person_id = result[0][0] + 1
 
-                            query = 'UPDATE detections SET person_id = %s WHERE id = %s'
-                            self.conn.execute(query,(self.person_id, self.num))
+                    if len(most_common_result) <= 0: #checking if there are results for the most_common query
+                        cam_count = 'SELECT DISTINCT cam_id from detections'
+                        cam_count_result = self.conn.execute(cam_count).fetchall()
+                        if len(cam_count_result) > 1: #checking if there are more than one camera sources
+                            max_personid = 'SELECT max(person_id) FROM detections WHERE id != %s'
+                            max_personid_result = self.conn.execute(max_personid,(self.num,)).fetchall()
+                            self.person_id = max_personid_result[0][0] + 1 
+                            #increase the person id by one because this means that there is no nearest neighbor for the vector, hence a new person
+                            
+                            update = 'UPDATE detections SET person_id = %s WHERE id = %s' #update the person id for that detection
+                            self.conn.execute(update,(self.person_id, self.num))
                             return_tracks.append(Merge(self.person_id, track.tlwh, track.score))
                             merged = True
 
-                    else:
-                        query = 'UPDATE detections SET person_id = %s WHERE id = %s'
-                        self.person_id = result[0][0]
-                        self.conn.execute(query,(self.person_id,self.num))
+                    else: #when there is a result for most_common query, update the current detection with that person id
+                        update = 'UPDATE detections SET person_id = %s WHERE id = %s'
+                        self.person_id = most_common_result[0][0]
+                        self.conn.execute(update,(self.person_id, self.num)) 
                         return_tracks.append(Merge(self.person_id, track.tlwh, track.score))
                         merged = True
                     print("frame id", self.frame_id/2, "New track id", self.person_id)
