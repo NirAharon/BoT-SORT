@@ -66,9 +66,9 @@ class FastReIDInterface:
         # self.model.eval()
 
 
-        self.model = get_levit('levit_384', pretrained=True, feature_dim=8192)
+        self.model = get_levit('levit_384', pretrained=True, feature_dim=1024)
 
-        self.ckpt_file = './levit_model/checkpoint_epoch_50.th'
+        self.ckpt_file = './levit_model/best_model.th'
 
         Checkpointer(self.model).load(self.ckpt_file)
 
@@ -126,7 +126,7 @@ class FastReIDInterface:
 
         #features = np.zeros((0, 2048))
         # features = np.zeros((0, 768))
-        features = np.zeros((0,8192))
+        features = np.zeros((0,1024))
 
         for patches in batch_patches:
 
