@@ -27,6 +27,7 @@ MODEL:
 
 INPUT:
   SIZE_TRAIN: [ 384, 128 ]
+  #SIZE_TEST: [ 384, 128] #Botsrt model
   SIZE_TEST: [ 224, 224 ]
 
   AUTOAUG:
