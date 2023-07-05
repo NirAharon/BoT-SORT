@@ -21,7 +21,7 @@ class MultiCameraTracking:
         #self.all_track_ids = []
         #self.indexes = []
         self.trackers = []
-        self.num = 0
+        #self.num = 0
         self.frame_id = 0
         self.person_id = 0
         
@@ -37,11 +37,19 @@ class MultiCameraTracking:
         self.conn.execute('CREATE EXTENSION IF NOT EXISTS vector')
         register_vector(self.conn)
         self.conn.execute('DROP TABLE IF EXISTS detections')
-        self.conn.execute('CREATE TABLE detections (id integer PRIMARY KEY, cam_id integer, activated BOOLEAN, x integer, y integer, width integer, height integer, person_id integer, embedding vector(1024))')
+        self.conn.execute('CREATE TABLE detections (id integer PRIMARY KEY, cam_id integer, activated BOOLEAN, x integer, y integer, width integer, height integer, person_id integer, person_name varchar, embedding vector(1024))')
         self.conn.execute('CREATE INDEX ON detections USING ivfflat (embedding vector_cosine_ops)')
+
+        query = 'SELECT COUNT(*) FROM detections'
+        result = self.conn.execute(query).fetchall()
+        print(result[0][0])
+        if result[0][0] == 0:
+            self.num = result[0][0]
+        else:
+            self.num = result[0][0] + 1
         
     def process(self, output_results, img, cam_id):
-        merged = False
+
         #self.frame_id += 1
         active_tracks = []
         self.conn.execute('UPDATE detections SET activated = False')
@@ -61,8 +69,9 @@ class MultiCameraTracking:
                 # if result[0][0] < 100:
 
                 #Adding track to database
-                query = 'INSERT INTO detections (id, cam_id, activated, x, y, width, height, person_id, embedding) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)'
-                self.conn.execute(query, (self.num, cam_id, False, x, y, width, height, track.track_id, track.curr_feat.astype(np.float32)))
+                query = 'INSERT INTO detections (id, cam_id, activated, x, y, width, height, person_id, person_name, embedding) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
+                self.conn.execute(query, (self.num, cam_id, False, x, y, width, height, track.track_id, 'unknown', track.curr_feat.astype(np.float32)))
+                print(active_tracks, "Active tracks")
                 for i in active_tracks:
                     query = 'UPDATE detections SET activated = %s WHERE person_id = %s'
                     self.conn.execute(query,(True,i))
@@ -86,19 +95,20 @@ class MultiCameraTracking:
                     #track_ids = [row[0] for row in result if row[2] <= 0.01]
 
 
-                    if len(most_common_result) <= 0: #checking if there are results for the most_common query
+                    if len(most_common_result) == 0: #checking if there are results for the most_common query
                         cam_count = 'SELECT DISTINCT cam_id from detections'
                         cam_count_result = self.conn.execute(cam_count).fetchall()
                         if len(cam_count_result) > 1: #checking if there are more than one camera sources
                             same_common = 'SELECT person_id, COUNT(*) AS count \
                                     FROM (SELECT person_id, embedding, embedding::vector <-> %s::vector AS distance FROM detections \
-                                    WHERE cam_id = %s embedding::vector <-> %s::vector < %s AND activated = %s ORDER BY embedding::vector <-> %s::vector LIMIT 101) \
+                                    WHERE embedding::vector <-> %s::vector < %s AND activated = %s AND id != %s ORDER BY embedding::vector <-> %s::vector LIMIT 101) \
                                     AS subquery \
                                     GROUP BY person_id \
                                     ORDER BY count DESC \
                                     LIMIT 1;'
-                            same_common_result = self.conn.execute(most_common, (query_vector, cam_id, query_vector, 0.15, False, query_vector)).fetchall()
-                            if len(same_common_result) <= 0:
+                            same_common_result = self.conn.execute(same_common, (query_vector, query_vector, 0.95, False, self.num, query_vector)).fetchall()
+                            print("same_common",same_common_result)
+                            if len(same_common_result) == 0:
                                 print("no common")
                                 max_personid = 'SELECT max(person_id) FROM detections WHERE id != %s'
                                 max_personid_result = self.conn.execute(max_personid,(self.num,)).fetchall()
@@ -107,59 +117,40 @@ class MultiCameraTracking:
                                 
                                 update = 'UPDATE detections SET person_id = %s WHERE id = %s' #update the person id for that detection
                                 self.conn.execute(update,(self.person_id, self.num))
-                                return_tracks.append(Merge(self.person_id, track.tlwh, track.score))
-                                merged = True
+                                return_tracks.append(Merge(self.person_id, track.tlwh, track.score, 'unknown'))
                                 active_tracks.append(self.person_id)
                             else:
-                                update = 'UPDATE detections SET person_id = %s WHERE id = %s'
+                                update = 'UPDATE detections SET person_id = %s, person_name = %s WHERE id = %s'
                                 self.person_id = same_common_result[0][0]
-                                self.conn.execute(update,(self.person_id, self.num))
-                                return_tracks.append(Merge(self.person_id, track.tlwh, track.score))
-                                merged = True
-                                active_tracks.append(self.person_id) 
+                                name_query = 'SELECT person_name FROM detections WHERE person_id = %s'
+                                name_result = self.conn.execute(name_query,(self.person_id,)).fetchone()
+                                self.conn.execute(update,(self.person_id, name_result[0], self.num))
+                                return_tracks.append(Merge(self.person_id, track.tlwh, track.score, name_result[0]))
+                                active_tracks.append(self.person_id)
+                        else:
+                            return_tracks.append(Merge(track.track_id,track.tlwh,track.score,'unknown'))
 
                     else: #when there is a result for most_common query, update the current detection with that person id
-                        update = 'UPDATE detections SET person_id = %s WHERE id = %s'
+                        update = 'UPDATE detections SET person_id = %s, person_name = %s WHERE id = %s'
                         self.person_id = most_common_result[0][0]
-                        self.conn.execute(update,(self.person_id, self.num)) 
-                        return_tracks.append(Merge(self.person_id, track.tlwh, track.score))
-                        merged = True
+                        name_query = 'SELECT person_name FROM detections WHERE person_id = %s'
+                        name_result = self.conn.execute(name_query,(self.person_id,)).fetchone()
+                        self.conn.execute(update,(self.person_id, name_result[0], self.num)) 
+                        return_tracks.append(Merge(self.person_id, track.tlwh, track.score, name_result[0]))
                         active_tracks.append(self.person_id)
                     #print("frame id", self.frame_id/2, "New track id", self.person_id)
+                else:
+                    return_tracks.append(Merge(track.track_id,track.tlwh,track.score,'unknown'))
                 self.num += 1
-                        
-                    # # Count the occurrences of each track_id
-                    #     track_id_counts = Counter(track_ids)
-                    #     print(track_id_counts)
-                    #     # Find the most common track_id
-                    #     most_common_track_id = track_id_counts.most_common(1)[0][0]
 
-                    #     query = 'INSERT INTO detections (cam_id, track_id, x, y, width, height, person_id, embedding) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)'
-                    #     self.conn.execute(query, (cam_id, track.track_id, x, y, width, height, most_common_track_id, track.curr_feat.astype(np.float32)))
-                    #     new_id = most_common_track_id
-                    # else:
-                    #     query = 'SELECT max(person_id) FROM detections'
-                    #     result = self.conn.execute(query).fetchall()
-                    #     self.person_id = result[0][0] + 1
-                    #     query = 'INSERT INTO detections (cam_id, track_id, x, y, width, height, person_id, embedding) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)'
-                    #     self.conn.execute(query, (cam_id, track.track_id, x, y, width, height, self.person_id, track.curr_feat.astype(np.float32)))
-                    #     new_id = self.person_id
-
-                # return_tracks.append(Merge(new_id, track.tlwh, track.score))
-                # merged = True
-                # print(return_tracks)
-
-        if merged == True:
-            return return_tracks
-        else:
-            return new_tracks
+        return return_tracks
 
 class Merge():
-    def __init__(self, track_id, tlwh, score):
+    def __init__(self, track_id, tlwh, score, name):
         self.track_id = track_id
         self.tlwh = tlwh
         self.score = score
-
+        self.name = name
 
 
 
