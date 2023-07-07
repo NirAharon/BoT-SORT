@@ -12,6 +12,11 @@ from fast_reid.fastreid.engine import DefaultTrainer, default_argument_parser, d
 
 from sc_levit import get_levit
 # cudnn.benchmark = True
+import matplotlib.pyplot as plt
+#from FastSAM.fastsam import FastSAM, FastSAMPrompt
+
+from segment_anything import sam_model_registry, SamAutomaticMaskGenerator, SamPredictor
+import supervision as sv
 
 
 def setup_cfg(config_file, opts):
@@ -73,7 +78,9 @@ class FastReIDInterface:
         Checkpointer(self.model).load(self.ckpt_file)
 
         #Checkpointer(self.model).load(weights_path)
-        
+
+        #self.sam_model = FastSAM('/home/tony/Desktop/BoT-SORT/FastSAM/weights/FastSAM-x.pt')
+
         if self.device != 'cpu':
             self.model = self.model.eval().to(device='cuda')
         else:
@@ -96,13 +103,30 @@ class FastReIDInterface:
             tlbr[1] = max(0, tlbr[1])
             tlbr[2] = min(W - 1, tlbr[2])
             tlbr[3] = min(H - 1, tlbr[3])
-            patch = image[tlbr[1]:tlbr[3], tlbr[0]:tlbr[2], :]
+            #patch = image[tlbr[1]:tlbr[3], tlbr[0]:tlbr[2], :]
+            
+            sam_checkpoint = "/home/tony/Desktop/BoT-SORT/sam_weights/sam_vit_h_4b8939.pth"
+            model_type = "vit_h"
+            sam = sam_model_registry[model_type](checkpoint=sam_checkpoint)
+            sam.to(device='cuda')
+
+            mask_predictor = SamPredictor(sam)
+            image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            mask_predictor.set_image(image_rgb)
+            bbox = np.array(tlbr)
+
+            masks, scores, logits = mask_predictor.predict(box=bbox, multimask_output=False)
+            mask = masks[0].astype(np.uint8)
+            masked_img = cv2.bitwise_and(image,image,mask=mask)
+            patch = masked_img[tlbr[1]:tlbr[3], tlbr[0]:tlbr[2], :]
 
             # the model expects RGB inputs
             patch = patch[:, :, ::-1]
 
             # Apply pre-processing to image.
             patch = cv2.resize(patch, tuple(self.cfg.INPUT.SIZE_TEST[::-1]), interpolation=cv2.INTER_LINEAR)
+            cv2.imshow("mask",patch)
+            cv2.waitKey(1)
             # patch, scale = preprocess(patch, self.cfg.INPUT.SIZE_TEST[::-1])
 
             # plt.figure()

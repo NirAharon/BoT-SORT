@@ -91,7 +91,7 @@ class MultiCameraTracking:
                             ORDER BY count DESC \
                             LIMIT 1;'
                     most_common_result = self.conn.execute(most_common, (query_vector, cam_id, query_vector, 0.15, False, query_vector)).fetchall()
-                    #print(most_common_result)
+                    print("most common", most_common_result)
                     #track_ids = [row[0] for row in result if row[2] <= 0.01]
 
 
