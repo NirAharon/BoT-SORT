@@ -33,7 +33,7 @@ class MultiCameraTracking:
         
         #creating database and table
 
-        self.conn = psycopg.connect(dbname='testdb', autocommit=True)
+        self.conn = psycopg.connect(dbname='testdb', autocommit=True, port=5440)
         self.conn.execute('CREATE EXTENSION IF NOT EXISTS vector')
         register_vector(self.conn)
         self.conn.execute('DROP TABLE IF EXISTS detections')

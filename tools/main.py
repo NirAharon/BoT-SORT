@@ -22,6 +22,8 @@ from tracker.tracking_utils.timer import Timer
 from multicam import MultiCameraTracking
 from video_stream import RoundRobinVideoStream
 
+import torch
+torch.cuda.set_device(1)
 
 IMAGE_EXT = [".jpg", ".jpeg", ".webp", ".bmp", ".png"]
 
