@@ -17,6 +17,7 @@ import matplotlib.pyplot as plt
 
 from segment_anything import sam_model_registry, SamAutomaticMaskGenerator, SamPredictor
 import supervision as sv
+from transformers import Mask2FormerImageProcessor, AutoImageProcessor, Mask2FormerForUniversalSegmentation, AutoFeatureExtractor, SegformerForSemanticSegmentation
 
 
 def setup_cfg(config_file, opts):
@@ -79,10 +80,20 @@ class FastReIDInterface:
 
         #Checkpointer(self.model).load(weights_path)
 
-        #self.sam_model = FastSAM('/home/tony/Desktop/BoT-SORT/FastSAM/weights/FastSAM-x.pt')
+        sam_checkpoint = "/home/tony/Desktop/BoT-SORT/sam_weights/sam_vit_h_4b8939.pth"
+        model_type = "vit_h"
+        sam = sam_model_registry[model_type](checkpoint=sam_checkpoint)
+        sam.to(device='cuda')
+
+        self.mask_predictor = SamPredictor(sam)
+
+        # self.processor = Mask2FormerImageProcessor()
+        # self.processor = AutoImageProcessor.from_pretrained("facebook/mask2former-swin-base-coco-panoptic")
+        # self.mask_model = Mask2FormerForUniversalSegmentation.from_pretrained("facebook/mask2former-swin-base-coco-panoptic")
 
         if self.device != 'cpu':
             self.model = self.model.eval().to(device='cuda')
+            # self.mask_model = self.mask_model.eval().to(device='cuda')
         else:
             self.model = self.model.eval()
 
@@ -98,35 +109,51 @@ class FastReIDInterface:
         batch_patches = []
         patches = []
         for d in range(np.size(detections, 0)):
+            score = 0
+            index = 123456
             tlbr = detections[d, :4].astype(np.int_)
             tlbr[0] = max(0, tlbr[0])
             tlbr[1] = max(0, tlbr[1])
             tlbr[2] = min(W - 1, tlbr[2])
             tlbr[3] = min(H - 1, tlbr[3])
-            #patch = image[tlbr[1]:tlbr[3], tlbr[0]:tlbr[2], :]
+            patch = image[tlbr[1]:tlbr[3], tlbr[0]:tlbr[2], :]
+            print(patch.shape[0])
             
-            sam_checkpoint = "/home/tony/Desktop/BoT-SORT/sam_weights/sam_vit_h_4b8939.pth"
-            model_type = "vit_h"
-            sam = sam_model_registry[model_type](checkpoint=sam_checkpoint)
-            sam.to(device='cuda')
 
-            mask_predictor = SamPredictor(sam)
             image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-            mask_predictor.set_image(image_rgb)
+            self.mask_predictor.set_image(image_rgb)
             bbox = np.array(tlbr)
 
-            masks, scores, logits = mask_predictor.predict(box=bbox, multimask_output=False)
+            masks, scores, logits = self.mask_predictor.predict(box=bbox, multimask_output=False)
             mask = masks[0].astype(np.uint8)
             masked_img = cv2.bitwise_and(image,image,mask=mask)
             patch = masked_img[tlbr[1]:tlbr[3], tlbr[0]:tlbr[2], :]
 
             # the model expects RGB inputs
-            patch = patch[:, :, ::-1]
+            # patch = patch[:, :, ::-1]
+
+            # inputs = self.processor(images=patch, return_tensors="pt")
+            # inputs = {k: v.to(device='cuda') for k, v in inputs.items()}
+            # outputs = self.mask_model(**inputs)
+            # results = self.processor.post_process_panoptic_segmentation(outputs, target_sizes=[(patch.shape[0],patch.shape[1])])[0]
+            # print(results['segments_info'])
+            # for segment in results['segments_info']:
+            #     if segment['label_id'] == 0:
+            #         curr_score = segment['score']
+            #         if curr_score > score:
+            #             index = segment['id']
+            #             score = segment['score']
+            # if index != 123456:
+            #     mask = (results['segmentation'].to("cpu").numpy() == index)
+            #     mask = mask.astype(np.uint8)
+            #     patch = cv2.bitwise_and(patch,patch,mask=mask)
+            # else:
+            #     patch=patch
 
             # Apply pre-processing to image.
             patch = cv2.resize(patch, tuple(self.cfg.INPUT.SIZE_TEST[::-1]), interpolation=cv2.INTER_LINEAR)
             cv2.imshow("mask",patch)
-            cv2.waitKey(1)
+            cv2.waitKey(1000)
             # patch, scale = preprocess(patch, self.cfg.INPUT.SIZE_TEST[::-1])
 
             # plt.figure()
