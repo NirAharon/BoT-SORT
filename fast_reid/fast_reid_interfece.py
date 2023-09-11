@@ -80,12 +80,12 @@ class FastReIDInterface:
 
         #Checkpointer(self.model).load(weights_path)
 
-        sam_checkpoint = "/home/tony/Desktop/BoT-SORT/sam_weights/sam_vit_h_4b8939.pth"
-        model_type = "vit_h"
-        sam = sam_model_registry[model_type](checkpoint=sam_checkpoint)
-        sam.to(device='cuda')
+        # sam_checkpoint = "/home/tony/Desktop/BoT-SORT/sam_weights/sam_vit_h_4b8939.pth"
+        # model_type = "vit_h"
+        # sam = sam_model_registry[model_type](checkpoint=sam_checkpoint)
+        # sam.to(device='cuda')
 
-        self.mask_predictor = SamPredictor(sam)
+        # self.mask_predictor = SamPredictor(sam)
 
         # self.processor = Mask2FormerImageProcessor()
         # self.processor = AutoImageProcessor.from_pretrained("facebook/mask2former-swin-base-coco-panoptic")
@@ -120,17 +120,17 @@ class FastReIDInterface:
             print(patch.shape[0])
             
 
-            image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-            self.mask_predictor.set_image(image_rgb)
-            bbox = np.array(tlbr)
+            # image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            # # self.mask_predictor.set_image(image_rgb)
+            # bbox = np.array(tlbr)
 
-            masks, scores, logits = self.mask_predictor.predict(box=bbox, multimask_output=False)
-            mask = masks[0].astype(np.uint8)
-            masked_img = cv2.bitwise_and(image,image,mask=mask)
-            patch = masked_img[tlbr[1]:tlbr[3], tlbr[0]:tlbr[2], :]
+            # masks, scores, logits = self.mask_predictor.predict(box=bbox, multimask_output=False)
+            # mask = masks[0].astype(np.uint8)
+            # masked_img = cv2.bitwise_and(image,image,mask=mask)
+            # patch = masked_img[tlbr[1]:tlbr[3], tlbr[0]:tlbr[2], :]
 
             # the model expects RGB inputs
-            # patch = patch[:, :, ::-1]
+            patch = patch[:, :, ::-1]
 
             # inputs = self.processor(images=patch, return_tensors="pt")
             # inputs = {k: v.to(device='cuda') for k, v in inputs.items()}
@@ -152,8 +152,8 @@ class FastReIDInterface:
 
             # Apply pre-processing to image.
             patch = cv2.resize(patch, tuple(self.cfg.INPUT.SIZE_TEST[::-1]), interpolation=cv2.INTER_LINEAR)
-            cv2.imshow("mask",patch)
-            cv2.waitKey(1000)
+            # cv2.imshow("mask",patch)
+            # cv2.waitKey(1000)
             # patch, scale = preprocess(patch, self.cfg.INPUT.SIZE_TEST[::-1])
 
             # plt.figure()

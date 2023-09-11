@@ -21,7 +21,10 @@ from tracker.tracking_utils.timer import Timer
 
 from multicam import MultiCameraTracking
 from video_stream import RoundRobinVideoStream
+from PySide6.QtCore import Signal
+from PySide6.QtWidgets import QWidget, QMainWindow, QApplication
 
+from transform import four_point_transform
 import torch
 #torch.cuda.set_device(1)
 
@@ -150,10 +153,34 @@ class Predictor(object):
             outputs = postprocess(outputs, self.num_classes, self.confthre, self.nmsthre)
         return outputs, img_info
 
-class MultiCamTracker:
+class MultiCamTracker(QWidget):
+    frame_update = Signal(int)
     def __init__(self, exp, args):
+        super().__init__()
         self.exp = exp
         self.args = args
+        self.output_list = []
+        # self.floor_plan = cv2.imread('random_floor_plan.jpg')  self.argts.path[]
+        # self.tran_matrix = np.load('transformation_matrix.npy')
+        self.floor_plan = np.zeros(((600, 600, 3)), np.uint8)
+        # self.args.plot_rect_tlwh = [[50, 50, 100, 100], [350, 50, 100, 100]]
+        self.tran_matrix = np.array([np.load(f'/home/abhilash/BoT-SORT/Transformation_matrices/{fname}.npy') for fname in self.args.cam_name])
+        self.warped_images = [cv2.imread(f'/home/abhilash/BoT-SORT/Warped_images/{fname}.jpg') for fname in self.args.cam_name]
+        # matrices_names = os.listdir('/home/abhilash/BoT-SORT/Transformation_matrices')
+        # print("Matrices: ",matrices_names)
+        # if len(matrices_names) > 0: # Transformation_matrices
+        #     self.tran_matrix = np.array([np.load(f'/home/abhilash/BoT-SORT/Transformation_matrices/{fname}') for fname in matrices_names])
+        # else:
+        #     print("No transformation matrices available")
+
+        
+        # # Also, store the ROI warped images with the same names
+        # warped_images = os.listdir('/home/abhilash/BoT-SORT/Warped_images')
+        # print("Warped images: ",warped_images)
+        # if len(warped_images) > 0:
+        #     self.warped_images = [cv2.imread(f'/home/abhilash/BoT-SORT/Warped_images/{fname}') for fname in warped_images]
+        # else:
+        #     print("No warped images found!")
 
     def main(self):
         if not self.args.experiment_name:
@@ -221,6 +248,35 @@ class MultiCamTracker:
         else:
             raise ValueError("Error: Unknown source: " + self.args.demo)
 
+        # Initializing the top view variables
+        # self.floor_plan = cv2.imread(self.args.path['floor_plan'])
+        # self.floor_plan = cv2.imread('/home/abhilash/BoT-SORT/random_floor_plan.jpg')
+    
+        # There will be one matrix for one camera. Store every matrix according to the camera name.
+        # Store every matrix in one folder called Transformation_matrices
+        # self.tran_matrix = np.load('/home/abhilash/BoT-SORT/transformation_matrix.npy')
+        # matrices_names = os.listdir('Transformation_matrices')
+        # if len(matrices_names) > 0:
+        #     self.tran_matrix = np.array([np.load(f'Transformation_matrices/{fname}') for fname in matrices_names])
+        # else:
+        #     print("No transformation matrices available")
+
+        
+        # Also, store the ROI warped images with the same names
+        # warped_images = os.listdir('Warped_images')
+        # if len(warped_images) > 0:
+        #     self.warped_images = [cv2.imread(f'Warped_images{fname}') for fname in warped_images]
+        # else:
+        #     print("No warped images found!")
+
+        # Not using a floor plan currently. Will be plotting on a black image.
+
+        # This is the variable which has the co-ordinates for calibration
+        self.selected_ROI = []
+
+        # This has the co-ordinates for where to plot on the floor plan.
+        # self.args.plot_rect_tlwh = [[50, 50, 100, 100], [350, 50, 100, 100]]
+
     def image_demo(predictor, vis_folder, current_time, args):
         if osp.isdir(args.path):
             files = get_image_list(args.path)
@@ -267,6 +323,7 @@ class MultiCamTracker:
                 online_im = plot_tracking(
                     img_info['raw_img'], online_tlwhs, online_ids, frame_id=frame_id, fps=1. / timer.average_time
                 )
+
             else:
                 timer.toc()
                 online_im = img_info['raw_img']
@@ -365,11 +422,61 @@ class MultiCamTracker:
                 f.writelines(results)
             logger.info(f"save results to {res_file}")
 
+    
+    def convert_list_to_bottom_center(self, coords_list):
+        bottom_center_coords_list = []
+        for tl_x, tl_y, width, height in coords_list:
+            bc_x = tl_x + width / 2
+            bc_y = tl_y + height
+            bottom_center_coords_list.append((bc_x, bc_y))
+        return bottom_center_coords_list            
+    
+    def map_to_target_region(self, point, cam_id):
+        # This x,y,width,height is supposed to be the area on the floor plan where the points are to be plotted.
+        # This will also come from the user.
+        # self.rectangle_tlwhs = 
+        print("Rectangle dimensions: ",self.args.plot_rect_tlwh[cam_id] )   #self.args.path['plot_rect_tlwh[cam_id] ']
+        x, y, width, height = self.args.plot_rect_tlwh[cam_id]  #self.args.path['plot_rect_tlwh[cam_id] ']
+        # x, y, width, height = 50, 50, 75, 75
+        # if cam_id == 0:
+            # x, y, width, height = self.args.plot_rect_tlwh[0]
+        # else:
+            # x, y, width, height = self.args.plot_rect_tlwh[1]
+        
+        # Map the point based on the dimensions of the target region
+        # Instead of using the floor_plan shape. 
+        # I think we should be using the shape of the image stored in the calibrate function.
+        # Change floor_plan.shape to the image selected.
+        
+        # mapped_x = x + int(point[0] * (width / self.floor_plan.shape[0]))   # self.args.path
+        # mapped_y = y + int(point[1] * (height / self.floor_plan.shape[1]))
+        print("Warped image shape: ",self.warped_images[cam_id].shape)
+        mapped_x = x + int(point[0] * (width / self.warped_images[cam_id].shape[0]))
+        mapped_y = y + int(point[1] * (height / self.warped_images[cam_id].shape[1]))
+        return int(mapped_x), int(mapped_y)            
+
+    def plot_on_top_view(self, points, ids, cam_ids):
+        print("Plot view cam ids: ",cam_ids)
+        points = self.convert_list_to_bottom_center(points)
+        pts = cv2.perspectiveTransform(
+        np.array(points, dtype=np.float32,).reshape(1, -1, 2), self.tran_matrix[cam_ids[0]])
+        # print("Inside plot top view",pts[0], ids)
+        # self.floor_plan = np.zeros(((800, 1200, 3)), np.uint8)
+        cv2.rectangle(self.floor_plan,(50,50), (125,125), (0, 255, 0), 2)
+        cv2.rectangle(self.floor_plan,(350,50), (450,150), (0, 255, 0), 2)
+        for (point,id,cam) in zip(pts[0],ids, cam_ids):
+            print(point)
+            if point[0] > 0 and point[1] > 0:
+                x, y = self.map_to_target_region(point, cam)
+                # cv2.circle(self.floor_plan, (p1, p2), 5, (0, 0, 255), -1)
+                cv2.putText(self.floor_plan, str(id), (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,255), 1, cv2.LINE_AA)
+
     def multicam(self,predictor, vis_folder, current_time, args):
 
         #tasks = []
         cam_id = 0
         tracker = MultiCameraTracking(self.args, frame_rate=self.args.fps)
+        # vs = iter(RoundRobinVideoStream(["rtsp://admin:dataeazeDZ!@192.168.0.103/cam/realmonitor?channel=1&subtype=0&unicast=true&proto=Onvif","rtsp://admin:dataeazeDZ!@192.168.0.102/cam/realmonitor?channel=1&subtype=0&unicast=true&proto=Onvif"]))
         vs = iter(RoundRobinVideoStream(args.path))
         num_cameras = vs.get_num_cameras()
         # width, height, fps = next(vs)[1:4]
@@ -419,7 +526,9 @@ class MultiCamTracker:
                     online_ids = []
                     online_scores = []
                     online_names = []
+                    online_cam_ids = []
                     for t in online_targets:
+                        print("Cam Id:", t.cam_id)
                         tlwh = t.tlwh
                         tid = t.track_id
                         vertical = tlwh[2] / tlwh[3] > args.aspect_ratio_thresh
@@ -428,6 +537,7 @@ class MultiCamTracker:
                             online_ids.append(tid)
                             online_scores.append(t.score)
                             online_names.append(t.name)
+                            online_cam_ids.append(t.cam_id)
                             results.append(
                                 f"{frame_id},{tid},{tlwh[0]:.2f},{tlwh[1]:.2f},{tlwh[2]:.2f},{tlwh[3]:.2f},{t.score:.2f},-1,-1,-1\n"
                             )
@@ -440,6 +550,25 @@ class MultiCamTracker:
                     timer.toc()
                     online_im = img_info['raw_img']
                     
+                # print("Online im: ",len(online_im))
+                self.output_list.append(online_im)
+                # print("Calling plot top view: ", online_tlwhs, online_ids)
+                # If no ROI is selected then no top view. Also, if no rectangle is available for plotting then no top view.
+                # If self.co-ordinate is empty don't plot on top view
+                # Assuming self.roi_area is the variable for the selected area on the camera feed
+                # self.args.plot_rect_tlwh is the variable for the co-ordinates of the rectangle on the floor plan in the form of top left and width and height.
+                # self.tran_matrix for storing all the transformation matrices
+                # self.warped_images for storing all the warped images.
+                # if len(self.args.plot_rect_tlwh) > 0 and len(self.tran_matrix) > 0 and len(self.warped_images) > 0 and len(self.roi_area) > 0:
+                # if len(self.args.plot_rect_tlwh) > 0 and len(self.args.cam_name) > 0:
+                if len(self.tran_matrix) > 0 and len(self.warped_images) > 0:
+                    if len(online_tlwhs) > 0 and len(online_ids)> 0:
+                        print("Calling plot top view: ", online_cam_ids)
+                        # self.floor_plan = np.zeros(((800, 1200, 3)), np.uint8)
+                        self.plot_on_top_view(online_tlwhs, online_ids, online_cam_ids)
+                    else:
+                        print("Empty")
+
                 grid_images.append(online_im)
 
                 if len(grid_images) > grid_size:
@@ -460,8 +589,14 @@ class MultiCamTracker:
                         grid[y:y+int(heights[0]), x:x+int(widths[0])] = frame
 
                     if grid_width > 0 and grid_height > 0:
-                        cv2.imshow("Grid", grid)
-                        cv2.waitKey(1)
+                        print("Emitting")
+                        print("Output list: ",len(self.output_list))
+                        self.copy_output_list = self.output_list
+                        self.frame_update.emit(1)
+                        print("Emited")
+                        self.output_list = []
+                        cv2.imshow("Grid", self.floor_plan)
+                        # cv2.waitKey(1)
 
                 if args.save_result:
                     vid_writer = vid_writers[c]
@@ -469,6 +604,7 @@ class MultiCamTracker:
                 ch = cv2.waitKey(1)
                 if ch == 27 or ch == ord("q") or ch == ord("Q"):
                     break
+            self.floor_plan = np.zeros(((600, 600, 3)), np.uint8)
         tracker.conn.close()
         # for video_path in args.path:
         #     task = imageflow_demo(tracker, predictor, vis_folder, current_time, args, video_path, cam_id)
@@ -476,15 +612,58 @@ class MultiCamTracker:
         #     cam_id += 1
         # await asyncio.gather(*tasks)
 
-        
+def print_this():
+    print("hello")
 
+class MainApp(QMainWindow):
+    def __init__(self, args, exp):
+        print("Inside init")
+        super().__init__()
+        self.args = args
+        self.args.plot_rect_tlwh = [[50, 50, 100, 100], [350, 50, 100, 100]]
+        self.args.cam_name = ['campus_short0']
+        self.exp = exp
+        print("Creating multicam object")
+        self.tracker = MultiCamTracker(self.exp, self.args)
+        self.tracker.frame_update.connect(self.print_this)
+        self.tracker.main()
+        print("multi cam main called")
+    def print_this(self, i):
+        print("Inside print this")
+        #print("Copy of output list: ",self.tracker.copy_output_list)
+        print("hello", i)
+        for image in self.tracker.copy_output_list:
+            cv2.imshow("image", image)
+def q_app_main(args, exp):
+    print("inside q app main")
+    app = QApplication(sys.argv)
+    window = MainApp(args, exp)
+    window.setMinimumSize(500, 500)
+    window.setStyleSheet("background-color: #DBDFEA;")
+    window.show()   
+    print("done with q app")
+    sys.exit(app.exec_())       
+
+def calibrate(cam_id, screenshot_img, calibrate_points):
+        #screenshot_img = [] # screenshot_img (The snapshot taken to mark the ROI)
+        #calibrate_points = [] # The points selected to mark the ROI
+        warped, temp, transformation_matrix = four_point_transform(
+            screenshot_img, np.array(calibrate_points[:4], dtype="float32"), (0,0)
+        )
+        np.save(f"Transformation_matrices/{cam_id}.npy",transformation_matrix)
+        cv2.imwrite(f"Warped_images/{cam_id}.jpg", warped)                                                                                                                                   
 
 if __name__ == "__main__":
+    print("In main")
     args = make_parser().parse_args()
     exp = get_exp(args.exp_file, args.name)
+    print("args ", args)
+    print("exp ", exp)
 
     args.ablation = False
     args.mot20 = not args.fuse_score
-
-    yolox_tracker = MultiCamTracker(exp, args)
-    yolox_tracker.main()
+    print("calling q app main")
+    q_app_main(args, exp)
+    # yolox_tracker = MultiCamTracker(exp, args)
+    # yolox_tracker.main()
+    yolox_tracker.frame_update.connect(print_this)

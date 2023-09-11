@@ -28,7 +28,7 @@ class MultiCameraTracking:
 
         for i in range(num_sources):
             self.trackers.append(BoTSORT(args, frame_rate=args.fps))
-        print(self.trackers)
+        print("Trackers:",self.trackers)
 
         
         #creating database and table
@@ -42,7 +42,7 @@ class MultiCameraTracking:
 
         query = 'SELECT COUNT(*) FROM detections'
         result = self.conn.execute(query).fetchall()
-        print(result[0][0])
+        print("Result: ",result[0][0])
         if result[0][0] == 0:
             self.num = result[0][0]
         else:
@@ -117,7 +117,7 @@ class MultiCameraTracking:
                                 
                                 update = 'UPDATE detections SET person_id = %s WHERE id = %s' #update the person id for that detection
                                 self.conn.execute(update,(self.person_id, self.num))
-                                return_tracks.append(Merge(self.person_id, track.tlwh, track.score, 'unknown'))
+                                return_tracks.append(Merge(self.person_id, track.tlwh, track.score, 'unknown', cam_id))
                                 active_tracks.append(self.person_id)
                             else:
                                 update = 'UPDATE detections SET person_id = %s, person_name = %s WHERE id = %s'
@@ -125,10 +125,10 @@ class MultiCameraTracking:
                                 name_query = 'SELECT person_name FROM detections WHERE person_id = %s'
                                 name_result = self.conn.execute(name_query,(self.person_id,)).fetchone()
                                 self.conn.execute(update,(self.person_id, name_result[0], self.num))
-                                return_tracks.append(Merge(self.person_id, track.tlwh, track.score, name_result[0]))
+                                return_tracks.append(Merge(self.person_id, track.tlwh, track.score, name_result[0], cam_id))
                                 active_tracks.append(self.person_id)
                         else:
-                            return_tracks.append(Merge(track.track_id,track.tlwh,track.score,'unknown'))
+                            return_tracks.append(Merge(track.track_id,track.tlwh,track.score,'unknown', cam_id))
 
                     else: #when there is a result for most_common query, update the current detection with that person id
                         update = 'UPDATE detections SET person_id = %s, person_name = %s WHERE id = %s'
@@ -136,22 +136,23 @@ class MultiCameraTracking:
                         name_query = 'SELECT person_name FROM detections WHERE person_id = %s'
                         name_result = self.conn.execute(name_query,(self.person_id,)).fetchone()
                         self.conn.execute(update,(self.person_id, name_result[0], self.num)) 
-                        return_tracks.append(Merge(self.person_id, track.tlwh, track.score, name_result[0]))
+                        return_tracks.append(Merge(self.person_id, track.tlwh, track.score, name_result[0],cam_id))
                         active_tracks.append(self.person_id)
                     #print("frame id", self.frame_id/2, "New track id", self.person_id)
                 else:
-                    return_tracks.append(Merge(track.track_id,track.tlwh,track.score,'unknown'))
+                    return_tracks.append(Merge(track.track_id,track.tlwh,track.score,'unknown',cam_id))
                 self.num += 1
 
         return return_tracks
 
 class Merge():
-    def __init__(self, track_id, tlwh, score, name):
+    def __init__(self, track_id, tlwh, score, name, cam_id):
         self.track_id = track_id
         self.tlwh = tlwh
         self.score = score
         self.name = name
-
+        self.cam_id = cam_id
+        # Add one more argument for cam id
 
 
 
