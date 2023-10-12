@@ -233,7 +233,6 @@ class BoTSORT(object):
         refind_stracks = []
         lost_stracks = []
         removed_stracks = []
-
         if len(output_results):
             if output_results.shape[1] == 5:
                 scores = output_results[:, 4]
@@ -266,13 +265,13 @@ class BoTSORT(object):
 
         '''Extract embeddings '''
         if self.args.with_reid:
-            features_keep = self.encoder.inference(img, dets)
+            self.features_keep = self.encoder.inference(img, dets)
 
         if len(dets) > 0:
             '''Detections'''
             if self.args.with_reid:
                 detections = [STrack(STrack.tlbr_to_tlwh(tlbr), s, f) for
-                              (tlbr, s, f) in zip(dets, scores_keep, features_keep)]
+                              (tlbr, s, f) in zip(dets, scores_keep, self.features_keep)]
             else:
                 detections = [STrack(STrack.tlbr_to_tlwh(tlbr), s) for
                               (tlbr, s) in zip(dets, scores_keep)]
@@ -431,6 +430,9 @@ class BoTSORT(object):
 
 
         return output_stracks
+
+    def get_features_keep(self):
+        return self.features_keep
 
 
 def joint_stracks(tlista, tlistb):

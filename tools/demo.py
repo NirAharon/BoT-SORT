@@ -246,7 +246,9 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
 
             if outputs[0] is not None:
                 outputs = outputs[0].cpu().numpy()
+                #print(outputs)
                 detections = outputs[:, :7]
+                #print(detections)
                 detections[:, :4] /= scale
 
                 # Run tracker

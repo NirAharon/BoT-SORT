@@ -1,4 +1,5 @@
 import numpy as np
+import queue
 from collections import OrderedDict
 
 
@@ -14,6 +15,9 @@ class BaseTrack(object):
     _count = 0
 
     track_id = 0
+
+    global_ids_queue = queue.Queue()
+
     is_activated = False
     state = TrackState.New
 
@@ -34,8 +38,12 @@ class BaseTrack(object):
 
     @staticmethod
     def next_id():
-        BaseTrack._count += 1
-        return BaseTrack._count
+        if BaseTrack.global_ids_queue.empty():
+            BaseTrack.global_ids_queue.put(BaseTrack.track_id)
+            BaseTrack.track_id += 1
+        return BaseTrack.global_ids_queue.get_nowait()
+        # BaseTrack._count += 1
+        # return BaseTrack._count
 
     def activate(self, *args):
         raise NotImplementedError
