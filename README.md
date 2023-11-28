@@ -97,7 +97,7 @@ pip3 install faiss-gpu
 Download [MOT17](https://motchallenge.net/data/MOT17/) and [MOT20](https://motchallenge.net/data/MOT20/) from the [official website](https://motchallenge.net/). And put them in the following structure:
 
 ```
-<dataets_dir>
+<dataset_dir>
       │
       ├── MOT17
       │      ├── train
@@ -114,10 +114,10 @@ For training the ReID, detection patches must be generated as follows:
 cd <BoT-SORT_dir>
 
 # For MOT17 
-python3 fast_reid/datasets/generate_mot_patches.py --data_path <dataets_dir> --mot 17
+python3 fast_reid/datasets/generate_mot_patches.py --data_path <dataset_dir> --mot 17
 
 # For MOT20
- python3 fast_reid/datasets/generate_mot_patches.py --data_path <dataets_dir> --mot 20
+ python3 fast_reid/datasets/generate_mot_patches.py --data_path <dataset_dir> --mot 20
 ```
 Link dataset to FastReID ```export FASTREID_DATASETS=<BoT-SORT_dir>/fast_reid/datasets```. If left unset, the default is `fast_reid/datasets` 
  
@@ -164,7 +164,7 @@ Tuning the tracking parameters carefully could lead to higher performance. In th
 
 ```shell
 cd <BoT-SORT_dir>
-python3 tools/track.py <dataets_dir/MOT17> --default-parameters --with-reid --benchmark "MOT17" --eval "test" --fp16 --fuse
+python3 tools/track.py <dataset_dir/MOT17> --default-parameters --with-reid --benchmark "MOT17" --eval "test" --fp16 --fuse
 python3 tools/interpolation.py --txt_path <path_to_track_result>
 ```
 
@@ -172,7 +172,7 @@ python3 tools/interpolation.py --txt_path <path_to_track_result>
 
 ```shell
 cd <BoT-SORT_dir>
-python3 tools/track.py <dataets_dir/MOT20> --default-parameters --with-reid --benchmark "MOT20" --eval "test" --fp16 --fuse
+python3 tools/track.py <dataset_dir/MOT20> --default-parameters --with-reid --benchmark "MOT20" --eval "test" --fp16 --fuse
 python3 tools/interpolation.py --txt_path <path_to_track_result>
 ```
 
@@ -182,10 +182,10 @@ python3 tools/interpolation.py --txt_path <path_to_track_result>
 cd <BoT-SORT_dir>
 
 # BoT-SORT
-python3 tools/track.py <dataets_dir/MOT17> --default-parameters --benchmark "MOT17" --eval "val" --fp16 --fuse
+python3 tools/track.py <dataset_dir/MOT17> --default-parameters --benchmark "MOT17" --eval "val" --fp16 --fuse
 
 # BoT-SORT-ReID
-python3 tools/track.py <dataets_dir/MOT17> --default-parameters --with-reid --benchmark "MOT17" --eval "val" --fp16 --fuse
+python3 tools/track.py <dataset_dir/MOT17> --default-parameters --with-reid --benchmark "MOT17" --eval "val" --fp16 --fuse
 ```
 
 * **Other experiments**
