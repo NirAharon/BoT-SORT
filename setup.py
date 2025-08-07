@@ -42,8 +42,7 @@ def get_extensions():
 
 with open("yolox/__init__.py", "r") as f:
     version = re.search(
-        r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]',
-        f.read(), re.MULTILINE
+        r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', f.read(), re.MULTILINE
     ).group(1)
 
 
@@ -52,13 +51,16 @@ with open("README.md", "r") as f:
 
 
 setuptools.setup(
-    name="yolox",
+    name="botsort",
     version=version,
     author="basedet team",
     python_requires=">=3.6",
     long_description=long_description,
     ext_modules=get_extensions(),
-    classifiers=["Programming Language :: Python :: 3", "Operating System :: OS Independent"],
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "Operating System :: OS Independent",
+    ],
     cmdclass={"build_ext": torch.utils.cpp_extension.BuildExtension},
     packages=setuptools.find_namespace_packages(),
 )
