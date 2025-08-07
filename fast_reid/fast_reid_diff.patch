@@ -1,0 +1,1127 @@
+Only in ../fast-reid: .git
+diff -r fast_reid/INSTALL.md ../fast-reid/INSTALL.md
+28c28,29
+< comming soon
+---
+> 
+> Please check the [docker folder](docker)
+diff -r fast_reid/configs/Base-SBS.yml ../fast-reid/configs/Base-SBS.yml
+57c57
+<   CHECKPOINT_PERIOD: 1
+---
+>   CHECKPOINT_PERIOD: 20
+60c60
+<   EVAL_PERIOD: 1000
+---
+>   EVAL_PERIOD: 10
+63c63
+< CUDNN_BENCHMARK: False # True
+---
+> CUDNN_BENCHMARK: True
+Only in fast_reid/configs: MOT17
+Only in fast_reid/configs: MOT20
+diff -r fast_reid/configs/Market1501/bagtricks_vit.yml ../fast-reid/configs/Market1501/bagtricks_vit.yml
+12c12
+<     PRETRAIN_PATH: /home/nir/.cache/torch/checkpoints/jx_vit_base_p16_224-80ecf9dd.pth
+---
+>     PRETRAIN_PATH: /export/home/lxy/.cache/torch/checkpoints/jx_vit_base_p16_224-80ecf9dd.pth
+67,71c67,68
+< #  SCHED: CosineAnnealingLR
+< #  ETA_MIN_LR: 0.000016
+<   SCHED: MultiStepLR
+<   STEPS: [ 40, 90 ]
+<   GAMMA: 0.1
+---
+>   SCHED: CosineAnnealingLR
+>   ETA_MIN_LR: 0.000016
+79c76
+<   CHECKPOINT_PERIOD: 1
+---
+>   CHECKPOINT_PERIOD: 30
+82c79
+<   EVAL_PERIOD: 5000000
+---
+>   EVAL_PERIOD: 5
+85,86c82
+< # CUDNN_BENCHMARK: True
+< CUDNN_BENCHMARK: False
+---
+> CUDNN_BENCHMARK: True
+Only in ../fast-reid/datasets: README.md
+Only in fast_reid/datasets: generate_mot_patches.py
+diff -r fast_reid/demo/demo.py ../fast-reid/demo/demo.py
+20,22c20,22
+< from fast_reid.fastreid.config import get_cfg
+< from fast_reid.fastreid.utils.logger import setup_logger
+< from fast_reid.fastreid.utils.file_io import PathManager
+---
+> from fastreid.config import get_cfg
+> from fastreid.utils.logger import setup_logger
+> from fastreid.utils.file_io import PathManager
+85,96d84
+< 
+<     # ------------------------------------------------------------------------------------------------------------------
+<     train_data = 'DukeMTMC'
+<     method = 'sbs_S50'  # bagtricks_S50 | sbs_S50
+<     seq = 'MOT20-02'
+< 
+<     args.config_file = r'../configs/' + train_data + '/' + method + '.yml'
+<     args.input = [r'/home/nir/Datasets/MOT20/train/' + seq + '/img1', '*.jpg']
+<     args.output = seq + '_' + method + '_' + train_data
+<     args.opts = ['MODEL.WEIGHTS', '../pretrained/duke_bot_S50.pth']
+<     # ------------------------------------------------------------------------------------------------------------------
+< 
+103,105c91
+<             # args.input = glob.glob(os.path.expanduser(args.input[0]))
+<             args.input = glob.glob(os.path.expanduser(os.path.join(args.input[0], args.input[1])))
+<             args.input = sorted(args.input)
+---
+>             args.input = glob.glob(os.path.expanduser(args.input[0]))
+diff -r fast_reid/demo/plot_roc_with_pickle.py ../fast-reid/demo/plot_roc_with_pickle.py
+11c11
+< from fast_reid.fastreid.utils.visualizer import Visualizer
+---
+> from fastreid.utils.visualizer import Visualizer
+diff -r fast_reid/demo/predictor.py ../fast-reid/demo/predictor.py
+15c15
+< from fast_reid.fastreid.engine import DefaultPredictor
+---
+> from fastreid.engine import DefaultPredictor
+diff -r fast_reid/demo/visualize_result.py ../fast-reid/demo/visualize_result.py
+18,22c18,21
+< # from fast_reid.fastreid.evaluation import evaluate_rank
+< from fast_reid.fastreid.evaluation.rank import evaluate_rank
+< from fast_reid.fastreid.config import get_cfg
+< from fast_reid.fastreid.utils.logger import setup_logger
+< from fast_reid.fastreid.data import build_reid_test_loader
+---
+> from fastreid.evaluation import evaluate_rank
+> from fastreid.config import get_cfg
+> from fastreid.utils.logger import setup_logger
+> from fastreid.data import build_reid_test_loader
+24c23
+< from fast_reid.fastreid.utils.visualizer import Visualizer
+---
+> from fastreid.utils.visualizer import Visualizer
+105,116d103
+< 
+<     # ------------------------------------------------------------------------------------------------------------------
+<     # train_data = 'DukeMTMC'
+<     # method = 'sbs_S50'  # bagtricks_S50 | sbs_S50
+<     # seq = 'MOT20-02'
+<     # args.dataset_name = seq
+<     # args.config_file = r'../configs/' + train_data + '/' + method + '.yml'
+<     # args.input = [r'/home/nir/Datasets/MOT20/train/' + seq + '/img1', '*.jpg']
+<     # args.output = seq + '_' + method + '_' + train_data
+<     # args.opts = ['MODEL.WEIGHTS', '../pretrained/duke_bot_S50.pth']
+<     # ------------------------------------------------------------------------------------------------------------------
+< 
+diff -r fast_reid/docker/Dockerfile ../fast-reid/docker/Dockerfile
+2a3,5
+> # https://github.com/NVIDIA/nvidia-docker/issues/1632
+> RUN rm /etc/apt/sources.list.d/cuda.list
+> RUN rm /etc/apt/sources.list.d/nvidia-ml.list
+14a18
+> # https://github.com/facebookresearch/detectron2/issues/3933
+16c20
+< RUN wget https://bootstrap.pypa.io/get-pip.py && \
+---
+> RUN wget https://bootstrap.pypa.io/pip/3.6/get-pip.py && \
+diff -r fast_reid/docs/requirements.txt ../fast-reid/docs/requirements.txt
+20c20
+< faiss-gpu
+\ No newline at end of file
+---
+> faiss-cpu
+\ No newline at end of file
+Only in fast_reid: fast_reid_interfece.py
+diff -r fast_reid/fastreid/config/config.py ../fast-reid/fastreid/config/config.py
+291d290
+< 
+diff -r fast_reid/fastreid/data/build.py ../fast-reid/fastreid/data/build.py
+11c11,18
+< from torch._six import string_classes
+---
+> TORCH_MAJOR = int(torch.__version__.split('.')[0])
+> TORCH_MINOR = int(torch.__version__.split('.')[1])
+> 
+> if TORCH_MAJOR == 1 and TORCH_MINOR < 8:
+>     from torch._six import string_classes
+> else:
+>     string_classes = str
+> 
+14,15c21,22
+< from fast_reid.fastreid.config import configurable
+< from fast_reid.fastreid.utils import comm
+---
+> from fastreid.config import configurable
+> from fastreid.utils import comm
+22d28
+< 
+28,29c34
+< # _root = os.getenv("FASTREID_DATASETS", "datasets")
+< _root = os.getenv("FASTREID_DATASETS", "fast_reid/datasets")
+---
+> _root = os.getenv("FASTREID_DATASETS", "datasets")
+33d37
+< 
+diff -r fast_reid/fastreid/data/data_utils.py ../fast-reid/fastreid/data/data_utils.py
+14c14
+< from fast_reid.fastreid.utils.file_io import PathManager
+---
+> from fastreid.utils.file_io import PathManager
+diff -r fast_reid/fastreid/data/datasets/AirportALERT.py ../fast-reid/fastreid/data/datasets/AirportALERT.py
+9,10c9,10
+< from fast_reid.fastreid.data.datasets import DATASET_REGISTRY
+< from fast_reid.fastreid.data.datasets.bases import ImageDataset
+---
+> from fastreid.data.datasets import DATASET_REGISTRY
+> from fastreid.data.datasets.bases import ImageDataset
+diff -r fast_reid/fastreid/data/datasets/__init__.py ../fast-reid/fastreid/data/datasets/__init__.py
+16,17d15
+< from .mot17 import MOT17
+< from .mot20 import MOT20
+39d36
+< 
+diff -r fast_reid/fastreid/data/datasets/caviara.py ../fast-reid/fastreid/data/datasets/caviara.py
+10,11c10,11
+< from fast_reid.fastreid.data.datasets import DATASET_REGISTRY
+< from fast_reid.fastreid.data.datasets.bases import ImageDataset
+---
+> from fastreid.data.datasets import DATASET_REGISTRY
+> from fastreid.data.datasets.bases import ImageDataset
+diff -r fast_reid/fastreid/data/datasets/cuhk03.py ../fast-reid/fastreid/data/datasets/cuhk03.py
+10,11c10,11
+< from fast_reid.fastreid.data.datasets import DATASET_REGISTRY
+< from fast_reid.fastreid.utils.file_io import PathManager
+---
+> from fastreid.data.datasets import DATASET_REGISTRY
+> from fastreid.utils.file_io import PathManager
+diff -r fast_reid/fastreid/data/datasets/grid.py ../fast-reid/fastreid/data/datasets/grid.py
+10,11c10,11
+< from fast_reid.fastreid.data.datasets import DATASET_REGISTRY
+< from fast_reid.fastreid.data.datasets.bases import ImageDataset
+---
+> from fastreid.data.datasets import DATASET_REGISTRY
+> from fastreid.data.datasets.bases import ImageDataset
+diff -r fast_reid/fastreid/data/datasets/iLIDS.py ../fast-reid/fastreid/data/datasets/iLIDS.py
+10,11c10,11
+< from fast_reid.fastreid.data.datasets import DATASET_REGISTRY
+< from fast_reid.fastreid.data.datasets.bases import ImageDataset
+---
+> from fastreid.data.datasets import DATASET_REGISTRY
+> from fastreid.data.datasets.bases import ImageDataset
+diff -r fast_reid/fastreid/data/datasets/lpw.py ../fast-reid/fastreid/data/datasets/lpw.py
+10,11c10,11
+< from fast_reid.fastreid.data.datasets import DATASET_REGISTRY
+< from fast_reid.fastreid.data.datasets.bases import ImageDataset
+---
+> from fastreid.data.datasets import DATASET_REGISTRY
+> from fastreid.data.datasets.bases import ImageDataset
+Only in fast_reid/fastreid/data/datasets: mot17.py
+Only in fast_reid/fastreid/data/datasets: mot20.py
+Only in fast_reid/fastreid/data/datasets: mot20_.py
+diff -r fast_reid/fastreid/data/datasets/pes3d.py ../fast-reid/fastreid/data/datasets/pes3d.py
+10,11c10,11
+< from fast_reid.fastreid.data.datasets import DATASET_REGISTRY
+< from fast_reid.fastreid.data.datasets.bases import ImageDataset
+---
+> from fastreid.data.datasets import DATASET_REGISTRY
+> from fastreid.data.datasets.bases import ImageDataset
+diff -r fast_reid/fastreid/data/datasets/pku.py ../fast-reid/fastreid/data/datasets/pku.py
+10,11c10,11
+< from fast_reid.fastreid.data.datasets import DATASET_REGISTRY
+< from fast_reid.fastreid.data.datasets.bases import ImageDataset
+---
+> from fastreid.data.datasets import DATASET_REGISTRY
+> from fastreid.data.datasets.bases import ImageDataset
+diff -r fast_reid/fastreid/data/datasets/prai.py ../fast-reid/fastreid/data/datasets/prai.py
+10,11c10,11
+< from fast_reid.fastreid.data.datasets import DATASET_REGISTRY
+< from fast_reid.fastreid.data.datasets.bases import ImageDataset
+---
+> from fastreid.data.datasets import DATASET_REGISTRY
+> from fastreid.data.datasets.bases import ImageDataset
+diff -r fast_reid/fastreid/data/datasets/prid.py ../fast-reid/fastreid/data/datasets/prid.py
+9,10c9,10
+< from fast_reid.fastreid.data.datasets import DATASET_REGISTRY
+< from fast_reid.fastreid.data.datasets.bases import ImageDataset
+---
+> from fastreid.data.datasets import DATASET_REGISTRY
+> from fastreid.data.datasets.bases import ImageDataset
+diff -r fast_reid/fastreid/data/datasets/saivt.py ../fast-reid/fastreid/data/datasets/saivt.py
+10,11c10,11
+< from fast_reid.fastreid.data.datasets import DATASET_REGISTRY
+< from fast_reid.fastreid.data.datasets.bases import ImageDataset
+---
+> from fastreid.data.datasets import DATASET_REGISTRY
+> from fastreid.data.datasets.bases import ImageDataset
+diff -r fast_reid/fastreid/data/datasets/sensereid.py ../fast-reid/fastreid/data/datasets/sensereid.py
+10,11c10,11
+< from fast_reid.fastreid.data.datasets import DATASET_REGISTRY
+< from fast_reid.fastreid.data.datasets.bases import ImageDataset
+---
+> from fastreid.data.datasets import DATASET_REGISTRY
+> from fastreid.data.datasets.bases import ImageDataset
+diff -r fast_reid/fastreid/data/datasets/shinpuhkan.py ../fast-reid/fastreid/data/datasets/shinpuhkan.py
+9,10c9,10
+< from fast_reid.fastreid.data.datasets import DATASET_REGISTRY
+< from fast_reid.fastreid.data.datasets.bases import ImageDataset
+---
+> from fastreid.data.datasets import DATASET_REGISTRY
+> from fastreid.data.datasets.bases import ImageDataset
+diff -r fast_reid/fastreid/data/datasets/sysu_mm.py ../fast-reid/fastreid/data/datasets/sysu_mm.py
+10,11c10,11
+< from fast_reid.fastreid.data.datasets import DATASET_REGISTRY
+< from fast_reid.fastreid.data.datasets.bases import ImageDataset
+---
+> from fastreid.data.datasets import DATASET_REGISTRY
+> from fastreid.data.datasets.bases import ImageDataset
+diff -r fast_reid/fastreid/data/datasets/thermalworld.py ../fast-reid/fastreid/data/datasets/thermalworld.py
+10,11c10,11
+< from fast_reid.fastreid.data.datasets import DATASET_REGISTRY
+< from fast_reid.fastreid.data.datasets.bases import ImageDataset
+---
+> from fastreid.data.datasets import DATASET_REGISTRY
+> from fastreid.data.datasets.bases import ImageDataset
+diff -r fast_reid/fastreid/data/datasets/viper.py ../fast-reid/fastreid/data/datasets/viper.py
+10,11c10,11
+< from fast_reid.fastreid.data.datasets import DATASET_REGISTRY
+< from fast_reid.fastreid.data.datasets.bases import ImageDataset
+---
+> from fastreid.data.datasets import DATASET_REGISTRY
+> from fastreid.data.datasets.bases import ImageDataset
+diff -r fast_reid/fastreid/data/samplers/data_sampler.py ../fast-reid/fastreid/data/samplers/data_sampler.py
+12c12
+< from fast_reid.fastreid.utils import comm
+---
+> from fastreid.utils import comm
+diff -r fast_reid/fastreid/data/samplers/imbalance_sampler.py ../fast-reid/fastreid/data/samplers/imbalance_sampler.py
+18c18
+< from fast_reid.fastreid.utils import comm
+---
+> from fastreid.utils import comm
+diff -r fast_reid/fastreid/data/samplers/triplet_sampler.py ../fast-reid/fastreid/data/samplers/triplet_sampler.py
+15c15
+< from fast_reid.fastreid.utils import comm
+---
+> from fastreid.utils import comm
+diff -r fast_reid/fastreid/engine/defaults.py ../fast-reid/fastreid/engine/defaults.py
+20,21c20,21
+< from fast_reid.fastreid.data import build_reid_test_loader, build_reid_train_loader
+< from fast_reid.fastreid.evaluation import (ReidEvaluator,
+---
+> from fastreid.data import build_reid_test_loader, build_reid_train_loader
+> from fastreid.evaluation import (ReidEvaluator,
+23,31c23,31
+< from fast_reid.fastreid.modeling.meta_arch import build_model
+< from fast_reid.fastreid.solver import build_lr_scheduler, build_optimizer
+< from fast_reid.fastreid.utils import comm
+< from fast_reid.fastreid.utils.checkpoint import Checkpointer
+< from fast_reid.fastreid.utils.collect_env import collect_env_info
+< from fast_reid.fastreid.utils.env import seed_all_rng
+< from fast_reid.fastreid.utils.events import CommonMetricPrinter, JSONWriter, TensorboardXWriter
+< from fast_reid.fastreid.utils.file_io import PathManager
+< from fast_reid.fastreid.utils.logger import setup_logger
+---
+> from fastreid.modeling.meta_arch import build_model
+> from fastreid.solver import build_lr_scheduler, build_optimizer
+> from fastreid.utils import comm
+> from fastreid.utils.checkpoint import Checkpointer
+> from fastreid.utils.collect_env import collect_env_info
+> from fastreid.utils.env import seed_all_rng
+> from fastreid.utils.events import CommonMetricPrinter, JSONWriter, TensorboardXWriter
+> from fastreid.utils.file_io import PathManager
+> from fastreid.utils.logger import setup_logger
+195d194
+< 
+197d195
+< 
+diff -r fast_reid/fastreid/engine/hooks.py ../fast-reid/fastreid/engine/hooks.py
+16,23c16,23
+< from fast_reid.fastreid.evaluation.testing import flatten_results_dict
+< from fast_reid.fastreid.solver import optim
+< from fast_reid.fastreid.utils import comm
+< from fast_reid.fastreid.utils.checkpoint import PeriodicCheckpointer as _PeriodicCheckpointer
+< from fast_reid.fastreid.utils.events import EventStorage, EventWriter, get_event_storage
+< from fast_reid.fastreid.utils.file_io import PathManager
+< from fast_reid.fastreid.utils.precision_bn import update_bn_stats, get_bn_modules
+< from fast_reid.fastreid.utils.timer import Timer
+---
+> from fastreid.evaluation.testing import flatten_results_dict
+> from fastreid.solver import optim
+> from fastreid.utils import comm
+> from fastreid.utils.checkpoint import PeriodicCheckpointer as _PeriodicCheckpointer
+> from fastreid.utils.events import EventStorage, EventWriter, get_event_storage
+> from fastreid.utils.file_io import PathManager
+> from fastreid.utils.precision_bn import update_bn_stats, get_bn_modules
+> from fastreid.utils.timer import Timer
+diff -r fast_reid/fastreid/engine/launch.py ../fast-reid/fastreid/engine/launch.py
+17c17
+< from fast_reid.fastreid.utils import comm
+---
+> from fastreid.utils import comm
+diff -r fast_reid/fastreid/engine/train_loop.py ../fast-reid/fastreid/engine/train_loop.py
+16,18c16,18
+< import fast_reid.fastreid.utils.comm as comm
+< from fast_reid.fastreid.utils.events import EventStorage, get_event_storage
+< from fast_reid.fastreid.utils.params import ContiguousParams
+---
+> import fastreid.utils.comm as comm
+> from fastreid.utils.events import EventStorage, get_event_storage
+> from fastreid.utils.params import ContiguousParams
+143d142
+<                     print("start epoch {}".format(self.epoch))
+148,149d146
+<                         if self.iter % 20 == 0:
+<                             print("iter {}".format(self.iter))
+diff -r fast_reid/fastreid/evaluation/clas_evaluator.py ../fast-reid/fastreid/evaluation/clas_evaluator.py
+14c14
+< from fast_reid.fastreid.utils import comm
+---
+> from fastreid.utils import comm
+diff -r fast_reid/fastreid/evaluation/evaluator.py ../fast-reid/fastreid/evaluation/evaluator.py
+9,10c9,10
+< from fast_reid.fastreid.utils import comm
+< from fast_reid.fastreid.utils.logger import log_every_n_seconds
+---
+> from fastreid.utils import comm
+> from fastreid.utils.logger import log_every_n_seconds
+Only in fast_reid/fastreid/evaluation/rank_cylib: rank_cy.c
+Only in fast_reid/fastreid/evaluation/rank_cylib: roc_cy.c
+diff -r fast_reid/fastreid/evaluation/rank_cylib/test_cython.py ../fast-reid/fastreid/evaluation/rank_cylib/test_cython.py
+8,9c8,9
+< from fast_reid.fastreid.evaluation.rank import evaluate_rank
+< from fast_reid.fastreid.evaluation.roc import evaluate_roc
+---
+> from fastreid.evaluation.rank import evaluate_rank
+> from fastreid.evaluation.roc import evaluate_roc
+27,28c27,28
+< from fast_reid.fastreid.evaluation.rank import evaluate_rank
+< from fast_reid.fastreid.evaluation.roc import evaluate_roc
+---
+> from fastreid.evaluation.rank import evaluate_rank
+> from fastreid.evaluation.roc import evaluate_roc
+diff -r fast_reid/fastreid/evaluation/reid_evaluation.py ../fast-reid/fastreid/evaluation/reid_evaluation.py
+17,18c17,18
+< from fast_reid.fastreid.utils import comm
+< from fast_reid.fastreid.utils.compute_dist import build_dist
+---
+> from fastreid.utils import comm
+> from fastreid.utils.compute_dist import build_dist
+diff -r fast_reid/fastreid/layers/splat.py ../fast-reid/fastreid/layers/splat.py
+12c12
+< from fast_reid.fastreid.layers import get_norm
+---
+> from fastreid.layers import get_norm
+diff -r fast_reid/fastreid/modeling/backbones/mobilenet.py ../fast-reid/fastreid/modeling/backbones/mobilenet.py
+14,15c14,15
+< from fast_reid.fastreid.layers import get_norm
+< from fast_reid.fastreid.utils.checkpoint import get_missing_parameters_message, get_unexpected_parameters_message
+---
+> from fastreid.layers import get_norm
+> from fastreid.utils.checkpoint import get_missing_parameters_message, get_unexpected_parameters_message
+diff -r fast_reid/fastreid/modeling/backbones/mobilenetv3.py ../fast-reid/fastreid/modeling/backbones/mobilenetv3.py
+17c17
+< from fast_reid.fastreid.layers import get_norm
+---
+> from fastreid.layers import get_norm
+diff -r fast_reid/fastreid/modeling/backbones/osnet.py ../fast-reid/fastreid/modeling/backbones/osnet.py
+15,17c15,17
+< from fast_reid.fastreid.layers import get_norm
+< from fast_reid.fastreid.utils import comm
+< from fast_reid.fastreid.utils.checkpoint import get_missing_parameters_message, get_unexpected_parameters_message
+---
+> from fastreid.layers import get_norm
+> from fastreid.utils import comm
+> from fastreid.utils.checkpoint import get_missing_parameters_message, get_unexpected_parameters_message
+diff -r fast_reid/fastreid/modeling/backbones/regnet/effnet.py ../fast-reid/fastreid/modeling/backbones/regnet/effnet.py
+15,18c15,18
+< from fast_reid.fastreid.layers import *
+< from fast_reid.fastreid.modeling.backbones.build import BACKBONE_REGISTRY
+< from fast_reid.fastreid.utils import comm
+< from fast_reid.fastreid.utils.checkpoint import get_missing_parameters_message, get_unexpected_parameters_message
+---
+> from fastreid.layers import *
+> from fastreid.modeling.backbones.build import BACKBONE_REGISTRY
+> from fastreid.utils import comm
+> from fastreid.utils.checkpoint import get_missing_parameters_message, get_unexpected_parameters_message
+diff -r fast_reid/fastreid/modeling/backbones/regnet/regnet.py ../fast-reid/fastreid/modeling/backbones/regnet/regnet.py
+8,10c8,10
+< from fast_reid.fastreid.layers import get_norm
+< from fast_reid.fastreid.utils import comm
+< from fast_reid.fastreid.utils.checkpoint import get_missing_parameters_message, get_unexpected_parameters_message
+---
+> from fastreid.layers import get_norm
+> from fastreid.utils import comm
+> from fastreid.utils.checkpoint import get_missing_parameters_message, get_unexpected_parameters_message
+562c562
+<         '4000x': 'fastreid/modeling/backbones/regnet/regnety/RegNetX-4.0GF_dds_8gpu.yaml',
+---
+>         '4000x': 'fastreid/modeling/backbones/regnet/regnetx/RegNetX-4.0GF_dds_8gpu.yaml',
+diff -r fast_reid/fastreid/modeling/backbones/repvgg.py ../fast-reid/fastreid/modeling/backbones/repvgg.py
+11,12c11,12
+< from fast_reid.fastreid.layers import *
+< from fast_reid.fastreid.utils.checkpoint import get_missing_parameters_message, get_unexpected_parameters_message
+---
+> from fastreid.layers import *
+> from fastreid.utils.checkpoint import get_missing_parameters_message, get_unexpected_parameters_message
+diff -r fast_reid/fastreid/modeling/backbones/resnest.py ../fast-reid/fastreid/modeling/backbones/resnest.py
+12,13c12,13
+< from fast_reid.fastreid.layers import SplAtConv2d, get_norm, DropBlock2D
+< from fast_reid.fastreid.utils.checkpoint import get_unexpected_parameters_message, get_missing_parameters_message
+---
+> from fastreid.layers import SplAtConv2d, get_norm, DropBlock2D
+> from fastreid.utils.checkpoint import get_unexpected_parameters_message, get_missing_parameters_message
+diff -r fast_reid/fastreid/modeling/backbones/resnet.py ../fast-reid/fastreid/modeling/backbones/resnet.py
+13c13
+< from fast_reid.fastreid.layers import (
+---
+> from fastreid.layers import (
+19c19
+< from fast_reid.fastreid.utils.checkpoint import get_missing_parameters_message, get_unexpected_parameters_message
+---
+> from fastreid.utils.checkpoint import get_missing_parameters_message, get_unexpected_parameters_message
+21c21
+< from fast_reid.fastreid.utils import comm
+---
+> from fastreid.utils import comm
+diff -r fast_reid/fastreid/modeling/backbones/resnext.py ../fast-reid/fastreid/modeling/backbones/resnext.py
+16,18c16,18
+< from fast_reid.fastreid.layers import *
+< from fast_reid.fastreid.utils import comm
+< from fast_reid.fastreid.utils.checkpoint import get_missing_parameters_message, get_unexpected_parameters_message
+---
+> from fastreid.layers import *
+> from fastreid.utils import comm
+> from fastreid.utils.checkpoint import get_missing_parameters_message, get_unexpected_parameters_message
+diff -r fast_reid/fastreid/modeling/backbones/shufflenet.py ../fast-reid/fastreid/modeling/backbones/shufflenet.py
+10c10
+< from fast_reid.fastreid.utils.checkpoint import get_missing_parameters_message, get_unexpected_parameters_message
+---
+> from fastreid.utils.checkpoint import get_missing_parameters_message, get_unexpected_parameters_message
+12,13c12,13
+< from fast_reid.fastreid.layers import get_norm
+< from fast_reid.fastreid.modeling.backbones import BACKBONE_REGISTRY
+---
+> from fastreid.layers import get_norm
+> from fastreid.modeling.backbones import BACKBONE_REGISTRY
+diff -r fast_reid/fastreid/modeling/backbones/vision_transformer.py ../fast-reid/fastreid/modeling/backbones/vision_transformer.py
+27,28c27,28
+< from fast_reid.fastreid.layers import DropPath, trunc_normal_, to_2tuple
+< from fast_reid.fastreid.utils.checkpoint import get_missing_parameters_message, get_unexpected_parameters_message
+---
+> from fastreid.layers import DropPath, trunc_normal_, to_2tuple
+> from fastreid.utils.checkpoint import get_missing_parameters_message, get_unexpected_parameters_message
+diff -r fast_reid/fastreid/modeling/heads/clas_head.py ../fast-reid/fastreid/modeling/heads/clas_head.py
+9c9
+< from fast_reid.fastreid.modeling.heads import REID_HEADS_REGISTRY, EmbeddingHead
+---
+> from .embedding_head import REID_HEADS_REGISTRY, EmbeddingHead
+22c22
+<         if self.cls_layer.__class__.__name__ == 'Linear':
+---
+>         if self.cls_layer.__class__.__name__ == "Linear":
+28c28,29
+<         if not self.training: return logits.mul_(self.cls_layer.s)
+---
+>         if not self.training:
+>             return logits.mul_(self.cls_layer.s)
+diff -r fast_reid/fastreid/modeling/heads/embedding_head.py ../fast-reid/fastreid/modeling/heads/embedding_head.py
+11,14c11,14
+< from fast_reid.fastreid.config import configurable
+< from fast_reid.fastreid.layers import *
+< from fast_reid.fastreid.layers import pooling, any_softmax
+< from fast_reid.fastreid.layers.weight_init import weights_init_kaiming
+---
+> from fastreid.config import configurable
+> from fastreid.layers import *
+> from fastreid.layers import pooling, any_softmax
+> from fastreid.layers.weight_init import weights_init_kaiming
+diff -r fast_reid/fastreid/modeling/losses/cross_entroy_loss.py ../fast-reid/fastreid/modeling/losses/cross_entroy_loss.py
+9c9
+< from fast_reid.fastreid.utils.events import get_event_storage
+---
+> from fastreid.utils.events import get_event_storage
+diff -r fast_reid/fastreid/modeling/meta_arch/baseline.py ../fast-reid/fastreid/modeling/meta_arch/baseline.py
+10,13c10,13
+< from fast_reid.fastreid.config import configurable
+< from fast_reid.fastreid.modeling.backbones import build_backbone
+< from fast_reid.fastreid.modeling.heads import build_heads
+< from fast_reid.fastreid.modeling.losses import *
+---
+> from fastreid.config import configurable
+> from fastreid.modeling.backbones import build_backbone
+> from fastreid.modeling.heads import build_heads
+> from fastreid.modeling.losses import *
+diff -r fast_reid/fastreid/modeling/meta_arch/build.py ../fast-reid/fastreid/modeling/meta_arch/build.py
+8c8
+< from fast_reid.fastreid.utils.registry import Registry
+---
+> from fastreid.utils.registry import Registry
+diff -r fast_reid/fastreid/modeling/meta_arch/distiller.py ../fast-reid/fastreid/modeling/meta_arch/distiller.py
+12,14c12,14
+< from fast_reid.fastreid.config import get_cfg
+< from fast_reid.fastreid.modeling.meta_arch import META_ARCH_REGISTRY, build_model, Baseline
+< from fast_reid.fastreid.utils.checkpoint import Checkpointer
+---
+> from fastreid.config import get_cfg
+> from fastreid.modeling.meta_arch import META_ARCH_REGISTRY, build_model, Baseline
+> from fastreid.utils.checkpoint import Checkpointer
+diff -r fast_reid/fastreid/modeling/meta_arch/mgn.py ../fast-reid/fastreid/modeling/meta_arch/mgn.py
+11,16c11,16
+< from fast_reid.fastreid.config import configurable
+< from fast_reid.fastreid.layers import get_norm
+< from fast_reid.fastreid.modeling.backbones import build_backbone
+< from fast_reid.fastreid.modeling.backbones.resnet import Bottleneck
+< from fast_reid.fastreid.modeling.heads import build_heads
+< from fast_reid.fastreid.modeling.losses import *
+---
+> from fastreid.config import configurable
+> from fastreid.layers import get_norm
+> from fastreid.modeling.backbones import build_backbone
+> from fastreid.modeling.backbones.resnet import Bottleneck
+> from fastreid.modeling.heads import build_heads
+> from fastreid.modeling.losses import *
+diff -r fast_reid/fastreid/modeling/meta_arch/moco.py ../fast-reid/fastreid/modeling/meta_arch/moco.py
+11,12c11,12
+< from fast_reid.fastreid.modeling.losses.utils import concat_all_gather
+< from fast_reid.fastreid.utils import comm
+---
+> from fastreid.modeling.losses.utils import concat_all_gather
+> from fastreid.utils import comm
+diff -r fast_reid/fastreid/solver/build.py ../fast-reid/fastreid/solver/build.py
+18,19c18,19
+< from fast_reid.fastreid.config import CfgNode
+< from fast_reid.fastreid.utils.params import ContiguousParams
+---
+> from fastreid.config import CfgNode
+> from fastreid.utils.params import ContiguousParams
+diff -r fast_reid/fastreid/utils/checkpoint.py ../fast-reid/fastreid/utils/checkpoint.py
+17c17
+< from fast_reid.fastreid.utils.file_io import PathManager
+---
+> from fastreid.utils.file_io import PathManager
+diff -r fast_reid/fastreid/utils/collect_env.py ../fast-reid/fastreid/utils/collect_env.py
+156c156
+<         from fast_reid.fastreid.utils.collect_env import collect_env_info
+---
+>         from fastreid.utils.collect_env import collect_env_info
+diff -r fast_reid/projects/FastAttr/fastattr/attr_dataset.py ../fast-reid/projects/FastAttr/fastattr/attr_dataset.py
+10c10
+< from fast_reid.fastreid.data.data_utils import read_image
+---
+> from fastreid.data.data_utils import read_image
+diff -r fast_reid/projects/FastAttr/fastattr/attr_evaluation.py ../fast-reid/projects/FastAttr/fastattr/attr_evaluation.py
+12,13c12,13
+< from fast_reid.fastreid.evaluation.evaluator import DatasetEvaluator
+< from fast_reid.fastreid.utils import comm
+---
+> from fastreid.evaluation.evaluator import DatasetEvaluator
+> from fastreid.utils import comm
+diff -r fast_reid/projects/FastAttr/fastattr/config.py ../fast-reid/projects/FastAttr/fastattr/config.py
+7c7
+< from fast_reid.fastreid.config import CfgNode as CN
+---
+> from fastreid.config import CfgNode as CN
+diff -r fast_reid/projects/FastAttr/fastattr/datasets/dukemtmcattr.py ../fast-reid/projects/FastAttr/fastattr/datasets/dukemtmcattr.py
+13c13
+< from fast_reid.fastreid.data.datasets import DATASET_REGISTRY
+---
+> from fastreid.data.datasets import DATASET_REGISTRY
+diff -r fast_reid/projects/FastAttr/fastattr/datasets/market1501attr.py ../fast-reid/projects/FastAttr/fastattr/datasets/market1501attr.py
+14c14
+< from fast_reid.fastreid.data.datasets import DATASET_REGISTRY
+---
+> from fastreid.data.datasets import DATASET_REGISTRY
+diff -r fast_reid/projects/FastAttr/fastattr/datasets/pa100k.py ../fast-reid/projects/FastAttr/fastattr/datasets/pa100k.py
+12c12
+< from fast_reid.fastreid.data.datasets import DATASET_REGISTRY
+---
+> from fastreid.data.datasets import DATASET_REGISTRY
+diff -r fast_reid/projects/FastAttr/fastattr/modeling/attr_baseline.py ../fast-reid/projects/FastAttr/fastattr/modeling/attr_baseline.py
+7,8c7,8
+< from fast_reid.fastreid.modeling.meta_arch.baseline import Baseline
+< from fast_reid.fastreid.modeling.meta_arch.build import META_ARCH_REGISTRY
+---
+> from fastreid.modeling.meta_arch.baseline import Baseline
+> from fastreid.modeling.meta_arch.build import META_ARCH_REGISTRY
+diff -r fast_reid/projects/FastAttr/fastattr/modeling/attr_head.py ../fast-reid/projects/FastAttr/fastattr/modeling/attr_head.py
+11,13c11,13
+< from fast_reid.fastreid.modeling.heads import EmbeddingHead
+< from fast_reid.fastreid.modeling.heads.build import REID_HEADS_REGISTRY
+< from fast_reid.fastreid.layers.weight_init import weights_init_kaiming
+---
+> from fastreid.modeling.heads import EmbeddingHead
+> from fastreid.modeling.heads.build import REID_HEADS_REGISTRY
+> from fastreid.layers.weight_init import weights_init_kaiming
+diff -r fast_reid/projects/FastAttr/train_net.py ../fast-reid/projects/FastAttr/train_net.py
+11,18c11,18
+< from fast_reid.fastreid.config import get_cfg
+< from fast_reid.fastreid.engine import DefaultTrainer
+< from fast_reid.fastreid.engine import default_argument_parser, default_setup, launch
+< from fast_reid.fastreid.utils.checkpoint import Checkpointer
+< from fast_reid.fastreid.data.datasets import DATASET_REGISTRY
+< from fast_reid.fastreid.data.build import _root, build_reid_train_loader, build_reid_test_loader
+< from fast_reid.fastreid.data.transforms import build_transforms
+< from fast_reid.fastreid.utils import comm
+---
+> from fastreid.config import get_cfg
+> from fastreid.engine import DefaultTrainer
+> from fastreid.engine import default_argument_parser, default_setup, launch
+> from fastreid.utils.checkpoint import Checkpointer
+> from fastreid.data.datasets import DATASET_REGISTRY
+> from fastreid.data.build import _root, build_reid_train_loader, build_reid_test_loader
+> from fastreid.data.transforms import build_transforms
+> from fastreid.utils import comm
+diff -r fast_reid/projects/FastClas/fastclas/bee_ant.py ../fast-reid/projects/FastClas/fastclas/bee_ant.py
+10,11c10,11
+< from fast_reid.fastreid.data.datasets import DATASET_REGISTRY
+< from fast_reid.fastreid.data.datasets.bases import ImageDataset
+---
+> from fastreid.data.datasets import DATASET_REGISTRY
+> from fastreid.data.datasets.bases import ImageDataset
+diff -r fast_reid/projects/FastClas/fastclas/dataset.py ../fast-reid/projects/FastClas/fastclas/dataset.py
+9c9
+< from fast_reid.fastreid.data.data_utils import read_image
+---
+> from fastreid.data.data_utils import read_image
+diff -r fast_reid/projects/FastClas/fastclas/trainer.py ../fast-reid/projects/FastClas/fastclas/trainer.py
+11,18c11,18
+< from fast_reid.fastreid.data.build import _root
+< from fast_reid.fastreid.data.build import build_reid_train_loader, build_reid_test_loader
+< from fast_reid.fastreid.data.datasets import DATASET_REGISTRY
+< from fast_reid.fastreid.data.transforms import build_transforms
+< from fast_reid.fastreid.engine import DefaultTrainer
+< from fast_reid.fastreid.evaluation.clas_evaluator import ClasEvaluator
+< from fast_reid.fastreid.utils import comm
+< from fast_reid.fastreid.utils.checkpoint import PathManager
+---
+> from fastreid.data.build import _root
+> from fastreid.data.build import build_reid_train_loader, build_reid_test_loader
+> from fastreid.data.datasets import DATASET_REGISTRY
+> from fastreid.data.transforms import build_transforms
+> from fastreid.engine import DefaultTrainer
+> from fastreid.evaluation.clas_evaluator import ClasEvaluator
+> from fastreid.utils import comm
+> from fastreid.utils.checkpoint import PathManager
+diff -r fast_reid/projects/FastClas/train_net.py ../fast-reid/projects/FastClas/train_net.py
+15,17c15,17
+< from fast_reid.fastreid.config import get_cfg
+< from fast_reid.fastreid.engine import default_argument_parser, default_setup, launch
+< from fast_reid.fastreid.utils.checkpoint import Checkpointer, PathManager
+---
+> from fastreid.config import get_cfg
+> from fastreid.engine import default_argument_parser, default_setup, launch
+> from fastreid.utils.checkpoint import Checkpointer, PathManager
+diff -r fast_reid/projects/FastDistill/fastdistill/overhaul.py ../fast-reid/projects/FastDistill/fastdistill/overhaul.py
+15c15
+< from fast_reid.fastreid.modeling.meta_arch import META_ARCH_REGISTRY, Distiller
+---
+> from fastreid.modeling.meta_arch import META_ARCH_REGISTRY, Distiller
+diff -r fast_reid/projects/FastDistill/fastdistill/resnet_distill.py ../fast-reid/projects/FastDistill/fastdistill/resnet_distill.py
+14c14
+< from fast_reid.fastreid.layers import (
+---
+> from fastreid.layers import (
+19,21c19,21
+< from fast_reid.fastreid.modeling.backbones import BACKBONE_REGISTRY
+< from fast_reid.fastreid.utils import comm
+< from fast_reid.fastreid.utils.checkpoint import get_missing_parameters_message, get_unexpected_parameters_message
+---
+> from fastreid.modeling.backbones import BACKBONE_REGISTRY
+> from fastreid.utils import comm
+> from fastreid.utils.checkpoint import get_missing_parameters_message, get_unexpected_parameters_message
+diff -r fast_reid/projects/FastDistill/train_net.py ../fast-reid/projects/FastDistill/train_net.py
+11,13c11,13
+< from fast_reid.fastreid.config import get_cfg
+< from fast_reid.fastreid.engine import default_argument_parser, default_setup, DefaultTrainer, launch
+< from fast_reid.fastreid.utils.checkpoint import Checkpointer
+---
+> from fastreid.config import get_cfg
+> from fastreid.engine import default_argument_parser, default_setup, DefaultTrainer, launch
+> from fastreid.utils.checkpoint import Checkpointer
+diff -r fast_reid/projects/FastFace/fastface/config.py ../fast-reid/projects/FastFace/fastface/config.py
+7c7
+< from fast_reid.fastreid.config import CfgNode as CN
+---
+> from fastreid.config import CfgNode as CN
+diff -r fast_reid/projects/FastFace/fastface/datasets/ms1mv2.py ../fast-reid/projects/FastFace/fastface/datasets/ms1mv2.py
+10,11c10,11
+< from fast_reid.fastreid.data.datasets import DATASET_REGISTRY
+< from fast_reid.fastreid.data.datasets.bases import ImageDataset
+---
+> from fastreid.data.datasets import DATASET_REGISTRY
+> from fastreid.data.datasets.bases import ImageDataset
+diff -r fast_reid/projects/FastFace/fastface/datasets/test_dataset.py ../fast-reid/projects/FastFace/fastface/datasets/test_dataset.py
+12,13c12,13
+< from fast_reid.fastreid.data.datasets import DATASET_REGISTRY
+< from fast_reid.fastreid.data.datasets.bases import ImageDataset
+---
+> from fastreid.data.datasets import DATASET_REGISTRY
+> from fastreid.data.datasets.bases import ImageDataset
+diff -r fast_reid/projects/FastFace/fastface/face_data.py ../fast-reid/projects/FastFace/fastface/face_data.py
+15c15
+< from fast_reid.fastreid.data.common import CommDataset
+---
+> from fastreid.data.common import CommDataset
+diff -r fast_reid/projects/FastFace/fastface/face_evaluator.py ../fast-reid/projects/FastFace/fastface/face_evaluator.py
+18,20c18,20
+< from fast_reid.fastreid.evaluation import DatasetEvaluator
+< from fast_reid.fastreid.utils import comm
+< from fast_reid.fastreid.utils.file_io import PathManager
+---
+> from fastreid.evaluation import DatasetEvaluator
+> from fastreid.utils import comm
+> from fastreid.utils.file_io import PathManager
+diff -r fast_reid/projects/FastFace/fastface/modeling/face_baseline.py ../fast-reid/projects/FastFace/fastface/modeling/face_baseline.py
+8,9c8,9
+< from fast_reid.fastreid.modeling.meta_arch import Baseline
+< from fast_reid.fastreid.modeling.meta_arch import META_ARCH_REGISTRY
+---
+> from fastreid.modeling.meta_arch import Baseline
+> from fastreid.modeling.meta_arch import META_ARCH_REGISTRY
+diff -r fast_reid/projects/FastFace/fastface/modeling/face_head.py ../fast-reid/projects/FastFace/fastface/modeling/face_head.py
+7,9c7,9
+< from fast_reid.fastreid.config import configurable
+< from fast_reid.fastreid.modeling.heads import EmbeddingHead
+< from fast_reid.fastreid.modeling.heads.build import REID_HEADS_REGISTRY
+---
+> from fastreid.config import configurable
+> from fastreid.modeling.heads import EmbeddingHead
+> from fastreid.modeling.heads.build import REID_HEADS_REGISTRY
+diff -r fast_reid/projects/FastFace/fastface/modeling/iresnet.py ../fast-reid/projects/FastFace/fastface/modeling/iresnet.py
+10,11c10,11
+< from fast_reid.fastreid.layers import get_norm
+< from fast_reid.fastreid.modeling.backbones import BACKBONE_REGISTRY
+---
+> from fastreid.layers import get_norm
+> from fastreid.modeling.backbones import BACKBONE_REGISTRY
+diff -r fast_reid/projects/FastFace/fastface/modeling/partial_fc.py ../fast-reid/projects/FastFace/fastface/modeling/partial_fc.py
+13,15c13,15
+< from fast_reid.fastreid.layers import any_softmax
+< from fast_reid.fastreid.modeling.losses.utils import concat_all_gather
+< from fast_reid.fastreid.utils import comm
+---
+> from fastreid.layers import any_softmax
+> from fastreid.modeling.losses.utils import concat_all_gather
+> from fastreid.utils import comm
+diff -r fast_reid/projects/FastFace/fastface/pfc_checkpointer.py ../fast-reid/projects/FastFace/fastface/pfc_checkpointer.py
+12,15c12,15
+< from fast_reid.fastreid.engine.hooks import PeriodicCheckpointer
+< from fast_reid.fastreid.utils import comm
+< from fast_reid.fastreid.utils.checkpoint import Checkpointer
+< from fast_reid.fastreid.utils.file_io import PathManager
+---
+> from fastreid.engine.hooks import PeriodicCheckpointer
+> from fastreid.utils import comm
+> from fastreid.utils.checkpoint import Checkpointer
+> from fastreid.utils.file_io import PathManager
+diff -r fast_reid/projects/FastFace/fastface/trainer.py ../fast-reid/projects/FastFace/fastface/trainer.py
+13,23c13,23
+< from fast_reid.fastreid.data.build import _root, build_reid_test_loader, build_reid_train_loader
+< from fast_reid.fastreid.data.datasets import DATASET_REGISTRY
+< from fast_reid.fastreid.data.transforms import build_transforms
+< from fast_reid.fastreid.engine import hooks
+< from fast_reid.fastreid.engine.defaults import DefaultTrainer, TrainerBase
+< from fast_reid.fastreid.engine.train_loop import SimpleTrainer, AMPTrainer
+< from fast_reid.fastreid.solver import build_optimizer
+< from fast_reid.fastreid.utils import comm
+< from fast_reid.fastreid.utils.checkpoint import Checkpointer
+< from fast_reid.fastreid.utils.logger import setup_logger
+< from fast_reid.fastreid.utils.params import ContiguousParams
+---
+> from fastreid.data.build import _root, build_reid_test_loader, build_reid_train_loader
+> from fastreid.data.datasets import DATASET_REGISTRY
+> from fastreid.data.transforms import build_transforms
+> from fastreid.engine import hooks
+> from fastreid.engine.defaults import DefaultTrainer, TrainerBase
+> from fastreid.engine.train_loop import SimpleTrainer, AMPTrainer
+> from fastreid.solver import build_optimizer
+> from fastreid.utils import comm
+> from fastreid.utils.checkpoint import Checkpointer
+> from fastreid.utils.logger import setup_logger
+> from fastreid.utils.params import ContiguousParams
+diff -r fast_reid/projects/FastFace/train_net.py ../fast-reid/projects/FastFace/train_net.py
+12,14c12,14
+< from fast_reid.fastreid.config import get_cfg
+< from fast_reid.fastreid.engine import default_argument_parser, default_setup, launch
+< from fast_reid.fastreid.utils.checkpoint import Checkpointer
+---
+> from fastreid.config import get_cfg
+> from fastreid.engine import default_argument_parser, default_setup, launch
+> from fastreid.utils.checkpoint import Checkpointer
+diff -r fast_reid/projects/FastRT/pybind_interface/market_benchmark.py ../fast-reid/projects/FastRT/pybind_interface/market_benchmark.py
+15,21c15,21
+< from fast_reid.fastreid.config import get_cfg
+< from fast_reid.fastreid.modeling.meta_arch import build_model
+< from fast_reid.fastreid.utils.file_io import PathManager
+< from fast_reid.fastreid.utils.checkpoint import Checkpointer
+< from fast_reid.fastreid.utils.logger import setup_logger
+< from fast_reid.fastreid.data import build_reid_train_loader, build_reid_test_loader
+< from fast_reid.fastreid.evaluation.rank import eval_market1501
+---
+> from fastreid.config import get_cfg
+> from fastreid.modeling.meta_arch import build_model
+> from fastreid.utils.file_io import PathManager
+> from fastreid.utils.checkpoint import Checkpointer
+> from fastreid.utils.logger import setup_logger
+> from fastreid.data import build_reid_train_loader, build_reid_test_loader
+> from fastreid.evaluation.rank import eval_market1501
+diff -r fast_reid/projects/FastRT/tools/gen_wts.py ../fast-reid/projects/FastRT/tools/gen_wts.py
+13,15c13,15
+< from fast_reid.fastreid.config import get_cfg
+< from fast_reid.fastreid.modeling.meta_arch import build_model
+< from fast_reid.fastreid.utils.checkpoint import Checkpointer
+---
+> from fastreid.config import get_cfg
+> from fastreid.modeling.meta_arch import build_model
+> from fastreid.utils.checkpoint import Checkpointer
+diff -r fast_reid/projects/FastRetri/fastretri/datasets.py ../fast-reid/projects/FastRetri/fastretri/datasets.py
+9,10c9,10
+< from fast_reid.fastreid.data.datasets import DATASET_REGISTRY
+< from fast_reid.fastreid.data.datasets.bases import ImageDataset
+---
+> from fastreid.data.datasets import DATASET_REGISTRY
+> from fastreid.data.datasets.bases import ImageDataset
+diff -r fast_reid/projects/FastRetri/fastretri/retri_evaluator.py ../fast-reid/projects/FastRetri/fastretri/retri_evaluator.py
+17,18c17,18
+< from fast_reid.fastreid.evaluation import DatasetEvaluator
+< from fast_reid.fastreid.utils import comm
+---
+> from fastreid.evaluation import DatasetEvaluator
+> from fastreid.utils import comm
+diff -r fast_reid/projects/FastRetri/train_net.py ../fast-reid/projects/FastRetri/train_net.py
+12,15c12,15
+< from fast_reid.fastreid.config import get_cfg
+< from fast_reid.fastreid.engine import default_argument_parser, default_setup, launch
+< from fast_reid.fastreid.utils.checkpoint import Checkpointer
+< from fast_reid.fastreid.engine.defaults import DefaultTrainer
+---
+> from fastreid.config import get_cfg
+> from fastreid.engine import default_argument_parser, default_setup, launch
+> from fastreid.utils.checkpoint import Checkpointer
+> from fastreid.engine.defaults import DefaultTrainer
+diff -r fast_reid/projects/FastTune/autotuner/tune_hooks.py ../fast-reid/projects/FastTune/autotuner/tune_hooks.py
+10,11c10,11
+< from fast_reid.fastreid.engine.hooks import EvalHook, flatten_results_dict
+< from fast_reid.fastreid.utils.checkpoint import Checkpointer
+---
+> from fastreid.engine.hooks import EvalHook, flatten_results_dict
+> from fastreid.utils.checkpoint import Checkpointer
+diff -r fast_reid/projects/FastTune/tune_net.py ../fast-reid/projects/FastTune/tune_net.py
+25,31c25,31
+< from fast_reid.fastreid.config import get_cfg, CfgNode
+< from fast_reid.fastreid.engine import hooks
+< from fast_reid.fastreid.modeling import build_model
+< from fast_reid.fastreid.engine import DefaultTrainer, default_argument_parser, default_setup
+< from fast_reid.fastreid.utils.events import CommonMetricPrinter
+< from fast_reid.fastreid.utils import comm
+< from fast_reid.fastreid.utils.file_io import PathManager
+---
+> from fastreid.config import get_cfg, CfgNode
+> from fastreid.engine import hooks
+> from fastreid.modeling import build_model
+> from fastreid.engine import DefaultTrainer, default_argument_parser, default_setup
+> from fastreid.utils.events import CommonMetricPrinter
+> from fastreid.utils import comm
+> from fastreid.utils.file_io import PathManager
+diff -r fast_reid/projects/NAIC20/naic/naic_dataset.py ../fast-reid/projects/NAIC20/naic/naic_dataset.py
+11,12c11,12
+< from fast_reid.fastreid.data.datasets import DATASET_REGISTRY
+< from fast_reid.fastreid.data.datasets.bases import ImageDataset
+---
+> from fastreid.data.datasets import DATASET_REGISTRY
+> from fastreid.data.datasets.bases import ImageDataset
+diff -r fast_reid/projects/NAIC20/naic/naic_evaluator.py ../fast-reid/projects/NAIC20/naic/naic_evaluator.py
+16,19c16,19
+< from fast_reid.fastreid.evaluation import ReidEvaluator
+< from fast_reid.fastreid.evaluation.query_expansion import aqe
+< from fast_reid.fastreid.utils import comm
+< from fast_reid.fastreid.utils.compute_dist import build_dist
+---
+> from fastreid.evaluation import ReidEvaluator
+> from fastreid.evaluation.query_expansion import aqe
+> from fastreid.utils import comm
+> from fastreid.utils.compute_dist import build_dist
+diff -r fast_reid/projects/NAIC20/train_net.py ../fast-reid/projects/NAIC20/train_net.py
+12c12
+< from fast_reid.fastreid.config import get_cfg
+---
+> from fastreid.config import get_cfg
+14,17c14,17
+< from fast_reid.fastreid.engine import default_argument_parser, default_setup, launch
+< from fast_reid.fastreid.utils.checkpoint import Checkpointer
+< from fast_reid.fastreid.engine import DefaultTrainer
+< from fast_reid.fastreid.data import build_reid_train_loader
+---
+> from fastreid.engine import default_argument_parser, default_setup, launch
+> from fastreid.utils.checkpoint import Checkpointer
+> from fastreid.engine import DefaultTrainer
+> from fastreid.data import build_reid_train_loader
+diff -r fast_reid/projects/PartialReID/partialreid/config.py ../fast-reid/projects/PartialReID/partialreid/config.py
+7c7
+< from fast_reid.fastreid.config import CfgNode as CN
+---
+> from fastreid.config import CfgNode as CN
+diff -r fast_reid/projects/PartialReID/partialreid/dsr_evaluation.py ../fast-reid/projects/PartialReID/partialreid/dsr_evaluation.py
+14,16c14,16
+< from fast_reid.fastreid.evaluation.evaluator import DatasetEvaluator
+< from fast_reid.fastreid.evaluation.rank import evaluate_rank
+< from fast_reid.fastreid.utils import comm
+---
+> from fastreid.evaluation.evaluator import DatasetEvaluator
+> from fastreid.evaluation.rank import evaluate_rank
+> from fastreid.utils import comm
+diff -r fast_reid/projects/PartialReID/partialreid/dsr_head.py ../fast-reid/projects/PartialReID/partialreid/dsr_head.py
+11,14c11,14
+< from fast_reid.fastreid.layers import *
+< from fast_reid.fastreid.modeling.heads import EmbeddingHead
+< from fast_reid.fastreid.modeling.heads.build import REID_HEADS_REGISTRY
+< from fast_reid.fastreid.layers.weight_init import weights_init_kaiming
+---
+> from fastreid.layers import *
+> from fastreid.modeling.heads import EmbeddingHead
+> from fastreid.modeling.heads.build import REID_HEADS_REGISTRY
+> from fastreid.layers.weight_init import weights_init_kaiming
+diff -r fast_reid/projects/PartialReID/partialreid/partial_dataset.py ../fast-reid/projects/PartialReID/partialreid/partial_dataset.py
+13,14c13,14
+< from fast_reid.fastreid.data.datasets import DATASET_REGISTRY
+< from fast_reid.fastreid.data.datasets.bases import ImageDataset
+---
+> from fastreid.data.datasets import DATASET_REGISTRY
+> from fastreid.data.datasets.bases import ImageDataset
+diff -r fast_reid/projects/PartialReID/partialreid/partialbaseline.py ../fast-reid/projects/PartialReID/partialreid/partialbaseline.py
+7,9c7,9
+< from fast_reid.fastreid.modeling.losses import *
+< from fast_reid.fastreid.modeling.meta_arch import Baseline
+< from fast_reid.fastreid.modeling.meta_arch.build import META_ARCH_REGISTRY
+---
+> from fastreid.modeling.losses import *
+> from fastreid.modeling.meta_arch import Baseline
+> from fastreid.modeling.meta_arch.build import META_ARCH_REGISTRY
+diff -r fast_reid/projects/PartialReID/train_net.py ../fast-reid/projects/PartialReID/train_net.py
+14,17c14,17
+< from fast_reid.fastreid.config import get_cfg
+< from fast_reid.fastreid.engine import DefaultTrainer, default_argument_parser, default_setup, launch
+< from fast_reid.fastreid.utils.checkpoint import Checkpointer
+< from fast_reid.fastreid.engine import hooks
+---
+> from fastreid.config import get_cfg
+> from fastreid.engine import DefaultTrainer, default_argument_parser, default_setup, launch
+> from fastreid.utils.checkpoint import Checkpointer
+> from fastreid.engine import hooks
+diff -r fast_reid/projects/README.md ../fast-reid/projects/README.md
+23c23
+< - [FastReID of Interpreter Project](https://github.com/SheldongChen/AMD.github.io)
+---
+> - [FastReID of Interpreter Project (ICCV 2021)](https://github.com/SheldongChen/AMD.github.io)
+Only in ../fast-reid: setup.py
+diff -r fast_reid/tests/dataset_test.py ../fast-reid/tests/dataset_test.py
+14c14
+< cfg.DATASETS.NAMES = ("market1501", "dukemtmc", "cuhk03", "msmt17", "mot17", "mot20",)
+---
+> cfg.DATASETS.NAMES = ("market1501", "dukemtmc", "cuhk03", "msmt17",)
+diff -r fast_reid/tests/model_test.py ../fast-reid/tests/model_test.py
+7,9c7,9
+< from fast_reid.fastreid.config import cfg
+< from fast_reid.fastreid.modeling.backbones import build_resnet_backbone
+< from fast_reid.fastreid.modeling.backbones.resnet_ibn_a import se_resnet101_ibn_a
+---
+> from fastreid.config import cfg
+> from fastreid.modeling.backbones import build_resnet_backbone
+> from fastreid.modeling.backbones.resnet_ibn_a import se_resnet101_ibn_a
+diff -r fast_reid/tests/sampler_test.py ../fast-reid/tests/sampler_test.py
+4c4
+< from fast_reid.fastreid.data.samplers import TrainingSampler
+---
+> from fastreid.data.samplers import TrainingSampler
+diff -r fast_reid/tests/test_repvgg.py ../fast-reid/tests/test_repvgg.py
+7,8c7,8
+< from fast_reid.fastreid.config import get_cfg
+< from fast_reid.fastreid.modeling.backbones import build_backbone
+---
+> from fastreid.config import get_cfg
+> from fastreid.modeling.backbones import build_backbone
+diff -r fast_reid/tools/deploy/caffe_export.py ../fast-reid/tools/deploy/caffe_export.py
+16,20c16,20
+< from fast_reid.fastreid.config import get_cfg
+< from fast_reid.fastreid.modeling.meta_arch import build_model
+< from fast_reid.fastreid.utils.file_io import PathManager
+< from fast_reid.fastreid.utils.checkpoint import Checkpointer
+< from fast_reid.fastreid.utils.logger import setup_logger
+---
+> from fastreid.config import get_cfg
+> from fastreid.modeling.meta_arch import build_model
+> from fastreid.utils.file_io import PathManager
+> from fastreid.utils.checkpoint import Checkpointer
+> from fastreid.utils.logger import setup_logger
+diff -r fast_reid/tools/deploy/onnx_export.py ../fast-reid/tools/deploy/onnx_export.py
+21,25c21,25
+< from fast_reid.fastreid.config import get_cfg
+< from fast_reid.fastreid.modeling.meta_arch import build_model
+< from fast_reid.fastreid.utils.file_io import PathManager
+< from fast_reid.fastreid.utils.checkpoint import Checkpointer
+< from fast_reid.fastreid.utils.logger import setup_logger
+---
+> from fastreid.config import get_cfg
+> from fastreid.modeling.meta_arch import build_model
+> from fastreid.utils.file_io import PathManager
+> from fastreid.utils.checkpoint import Checkpointer
+> from fastreid.utils.logger import setup_logger
+diff -r fast_reid/tools/deploy/trt_calibrator.py ../fast-reid/tools/deploy/trt_calibrator.py
+26,28c26,28
+< from fast_reid.fastreid.data.build import _root
+< from fast_reid.fastreid.data.data_utils import read_image
+< from fast_reid.fastreid.data.datasets import DATASET_REGISTRY
+---
+> from fastreid.data.build import _root
+> from fastreid.data.data_utils import read_image
+> from fastreid.data.datasets import DATASET_REGISTRY
+31c31
+< from fast_reid.fastreid.data.transforms import ToTensor
+---
+> from fastreid.data.transforms import ToTensor
+diff -r fast_reid/tools/deploy/trt_export.py ../fast-reid/tools/deploy/trt_export.py
+17c17
+< from fast_reid.fastreid.utils.logger import setup_logger, PathManager
+---
+> from fastreid.utils.logger import setup_logger, PathManager
+diff -r fast_reid/tools/plain_train_net.py ../fast-reid/tools/plain_train_net.py
+17,26c17,26
+< from fast_reid.fastreid.config import get_cfg
+< from fast_reid.fastreid.data import build_reid_test_loader, build_reid_train_loader
+< from fast_reid.fastreid.evaluation.testing import flatten_results_dict
+< from fast_reid.fastreid.engine import default_argument_parser, default_setup, launch
+< from fast_reid.fastreid.modeling import build_model
+< from fast_reid.fastreid.solver import build_lr_scheduler, build_optimizer
+< from fast_reid.fastreid.evaluation import inference_on_dataset, print_csv_format, ReidEvaluator
+< from fast_reid.fastreid.utils.checkpoint import Checkpointer, PeriodicCheckpointer
+< from fast_reid.fastreid.utils import comm
+< from fast_reid.fastreid.utils.events import (
+---
+> from fastreid.config import get_cfg
+> from fastreid.data import build_reid_test_loader, build_reid_train_loader
+> from fastreid.evaluation.testing import flatten_results_dict
+> from fastreid.engine import default_argument_parser, default_setup, launch
+> from fastreid.modeling import build_model
+> from fastreid.solver import build_lr_scheduler, build_optimizer
+> from fastreid.evaluation import inference_on_dataset, print_csv_format, ReidEvaluator
+> from fastreid.utils.checkpoint import Checkpointer, PeriodicCheckpointer
+> from fastreid.utils import comm
+> from fastreid.utils.events import (
+diff -r fast_reid/tools/train_net.py ../fast-reid/tools/train_net.py
+12,14c12,14
+< from fast_reid.fastreid.config import get_cfg
+< from fast_reid.fastreid.engine import DefaultTrainer, default_argument_parser, default_setup, launch
+< from fast_reid.fastreid.utils.checkpoint import Checkpointer
+---
+> from fastreid.config import get_cfg
+> from fastreid.engine import DefaultTrainer, default_argument_parser, default_setup, launch
+> from fastreid.utils.checkpoint import Checkpointer
+30d29
+< 
+46d44
+< 
+53d50
+< 
