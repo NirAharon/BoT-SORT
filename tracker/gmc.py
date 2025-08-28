@@ -264,8 +264,16 @@ class GMC:
 
             return H
 
-        # find correspondences
-        matchedKeypoints, status, err = cv2.calcOpticalFlowPyrLK(self.prevFrame, frame, self.prevKeyPoints, None)
+        # find correspondences with error handling
+        try:
+            matchedKeypoints, status, err = cv2.calcOpticalFlowPyrLK(self.prevFrame, frame, self.prevKeyPoints, None)
+        except:
+            print('Warning: find transform failed. Set warp as identity')
+            # Store to next iteration
+            self.prevFrame = frame.copy()
+            self.prevKeyPoints = copy.copy(keypoints)
+        
+            return H
 
         # leave good correspondences only
         prevPoints = []
